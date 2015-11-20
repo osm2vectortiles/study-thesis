@@ -156,7 +156,7 @@ By default, OpenSCAD does not support circle sectors. Therefore the shape had to
 be developed manually as a module.
 
 \vspace{.5\baselineskip}
-\begin{minted}[bgcolor=tango-bg,frame=lines,framesep=2mm,samepage=true,fontsize=\footnotesize]{javascript}
+\begin{minted}[frame=lines,framesep=2mm,samepage=true,fontsize=\footnotesize]{javascript}
 module circle_sector(r, a) {
     a1 = a % 360; a2 = 360 - (a % 360);
     if (a1 <= 180) {
