@@ -1,0 +1,103 @@
+\chapter{History of Webmaps}
+\label{history-of-webmaps}
+
+Web mapping has gone through different technologies and changes in
+the recent years. It is important to understand the evolution of web maps to understand why vector tiles are quite a fundamental change in how maps work.
+
+\paragraph{Phase 1: Untiled Static
+Maps}
+
+In the beginning WMS servers generated static images for an extract
+of the map. Each view of a map requested a unique extract of a map that was generated for this person.
+
+
+\paragraph{Phase 2: Raster Tiles}
+
+In 2005 Google introduced Google Maps and XYZ 
+tiles\footnote{\url{http://wiki.openstreetmap.org/wiki/Slippy_Map}}
+which delivered a idempotent raster image for coordinates specified by a
+tile index.
+
+
+\paragraph{Phase 2.5: Raster Tiles with Vector
+Overlays}
+
+To provide a level of interactivity tools like
+Leaflet\footnote{\url{http://leafletjs.com/}} support rendering vector
+data like SVG on top of a raster base map.
+
+In order to support fully interactive maps 
+
+\paragraph{Phase 2.75: Raster Tiles from Vector
+Tiles}
+
+For backwards compatibility and faster serving of raster tiles vector
+tiles where introduced to avoid querying a database.
+
+\paragraph{Phase 3: Vector Tiles}
+
+Vector tiles are delivered directly to the browser and rendered by Web
+GL based clients.
+
+
+Improving the use of vector data in web mapping is often shown as the next challenge
+of web mapping \cite[p.~88]{gaffuri2012toward} 
+
+\subsubsection{Vector Tile Formats}
+
+\paragraph{Mapbox Vector Tiles}
+
+When Mapbox introduced it's geography tool Mapbox Studio in 2013 they
+created the \emph{Mapbox Vector Tiles Specification}
+\footnote{\url{https://github.com/mapbox/vector-tile-spec}} which is
+implemented by a variety of tools and clients
+\footnote{\url{https://github.com/mapbox/awesome-vector-tiles}}
+including \emph{Mapbox GL JS}, \emph{Open Layers 3}, \emph{Leaflet},
+\emph{Mapzen Tangram} and Esri
+\footnote{\url{https://www.mapbox.com/blog/vector-tile-adoption/}} in
+the future.
+
+\subsubsection{Geopackage}
+
+The \emph{GeoPackage Encoding Standard} is the OGC counterpart to the
+\emph{Mapbox Vector Tiles Specification} which was introduced later and
+is supported by QGIS, ESRI and GDAL.
+
+\subsubsection{Google Maps}
+
+Google Maps is using vector tiles since 2010 under the hood and was the
+first provider implementing this. Styling is limited and the format
+propretiary.
+
+\subsubsection{Mapbox}
+
+In 2013 Mapbox introduced Mapbox Studio a geography tool working with
+vector tiles.
+
+\subsubsection{Mapzen}
+
+Was machen andere / welche ähnlichen Arbeiten gibt es zum Thema? Was
+kann von anderen verwendet werden?
+
+\subsubsection{Vector Tile Providers}\label{vector-tile-providers}
+
+\paragraph{Mapbox}
+
+\paragraph{Kartotherian}
+
+\paragraph{Mapzen}
+
+Diese Einleitung soll für den Ingenieur irgendeiner Fachrichtung
+verständlich sein.
+
+Sie stellt die Aufgabe in einen grösseren Zusammenhang und liefert eine
+genaue Beschreibung der Problemstellung.
+
+Allfällige Vorarbeiten oder ähnlich gelagerte Arbeiten werden
+diskutiert.
+
+Theoretische Grundlagen sind nur so weit auszuarbeiten, als dies für die
+Lösung der Aufgabe nötig ist (keine Lehrbücher schreiben).
+
+Die Erkenntnisse aus den theoretischen Untersuchungen sind wenn immer
+möglich direkt mit der Problemlösung zu verknüpfen.
