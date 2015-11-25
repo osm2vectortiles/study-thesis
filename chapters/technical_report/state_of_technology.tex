@@ -1,17 +1,15 @@
 \chapter{State of Technology}
 
-Currently most web maps are based on raster tiles. Vector tile based maps are
-a privilege of a few big providers like Google, Mapbox and Apple until now. The rest of the industry is now in the transition from raster based maps into vector based maps.
-
-For vector based maps the Mapbox Vector Tile Specification\footnote{\url{https://github.com/mapbox/vector-tile-spec/tree/master/1.0.1}} is the most dominant implementation.
-
-Take a look at the \hyperref[history-of-webmaps]{\emph{History of Webmaps}} chapter on (p. \pageref{history-of-webmaps}) which goes more into detail.
+As of today most web maps are based on raster tiles except a few big providers like Google, Mapbox and Apple.
+\marginpar{Take a look at the \hyperref[history-of-webmaps]{\emph{History of Webmaps}} chapter on (p. \pageref{history-of-webmaps}) which goes more into detail.}
+The rest of the industry is now in the transition from raster based maps into vector based maps. For vector based maps the Mapbox Vector Tile Specification\footnote{\url{https://github.com/mapbox/vector-tile-spec/tree/master/1.0.1}} is the most dominant Open Source specification of vector tiles.
 
 \section{Current Vector Data Providers}
 
 While the deployment setup for vector based maps is much simpler than
 the traditional raster tile setup the most complex part remains
 the creation of vector data which takes alot of time and care.
+
 
 \paragraph{Mapbox}
 
@@ -21,23 +19,36 @@ map hosting technologies since 2012 branded as Mapbox Streets\footnote{\url{http
 \paragraph{Mapzen}
 
 Mapzen provides API access to their public vector tiles\footnote{\url{https://mapzen.com/projects/vector-tiles/}}.
-\marginpar{Mapzen vector tiles can also be requested in GeoJSON, TopoJSON and Open Science Map format}. Mapzen states that access should remain free and Open Source.
+\marginpar{Mapzen vector tiles can also be requested in GeoJSON, TopoJSON and Open Science Map format}. Mapzen states that access and the platform should remain free and Open Source\footnote{\url{https://mapzen.com/about/}}. Mapzen however
+does not give access to the entire raw data and one is bound to
+the limitations of the service.
 
-Quote:
+\paragraph{Kartotherian}
 
-We build these things and provide them as a service, but these are tools that developers at any level can easily set up and use themselves, for free. We don’t want to lock users into proprietary platforms, relying on black boxes they can’t take apart.
+The Kartotherian\footnote{\url{https://www.mediawiki.org/wiki/Maps}} project from the Wikimedia Foundation is very similar to ours. They want to provide a free Map service from the Wikimedia Foundation that everyone can use for free. The data is bound to their service as well and the quality is still lacking.
 
-\paragraph{Google}
+\paragraph{Google and Apple }
 
-Google is using vector tiles since 2013 but they are not accessible for
-the general public and cannot be licensed as well.
-
-\paragraph{Apple}
-
-Apple is using propretiary vector tiles for their Apple Maps product.
+Apple started using vector tiles in their Apple Maps product in 2012\cite{wiki:apple-maps}  and  Google is using vector tiles since 2013\cite{wiki:google-maps} but they are not accessible for the general public and use a propretiary format.
 
 \section{Characteristics}
 
+While the providers open the process they still own the data in order
+to keep their strategic advantages and promote the use
+of their products using this data. The open process is a wonderful
+step in the right direction, yet it requires great understanding
+of alot of technology and alot of server power to actually
+execute the workflow of producing worldwide vector tiles.
+
+Kartotherian is a great project which we can contribute to with
+our improved maps.
+
 \section{Shortcomings}
 
-Potential improvements
+The providers already solve the problem of producing the vector tiles
+and making it accessible. The data however can only be used
+via their services.
+
+Being able to download world data and use it in a custom server
+infrastructure, offline or however you want is a big advantage
+and a problem we want to solve.

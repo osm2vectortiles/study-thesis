@@ -1,0 +1,37 @@
+\chapter{Data Sources}
+\label{data-sources}
+
+Making a map involves finding the right data slice in the right
+data sources.
+
+\section{OpenStreetMap}
+
+The biggest part of our data originates from published OpenStreetMap snapshots. The OpenStreetMap data is used to provide the detailed parts of the map and is the cornerstone of the entire map.
+
+We import selected key value pairs and their geometries of the entire OpenStreetMap database from Planet OSM \footnote{\url{http://planet.osm.org/}}.
+
+
+\section{Curated OpenStreetMap Data}
+
+Certain OpenStreetMap data like borders and land polygons are very sensitive for change.
+The OpenStreetMapData\footnote{\url{http://openstreetmapdata.com/}}
+project takes care of alot of issues that happen with coastlines
+and provide it in a convenient format.
+
+We use the following data from OpenStreetMapData:
+
+\begin{itemize}
+\item Water polygons
+\end{itemize}
+
+\section{Natural Earth}
+
+The Natural Earth \footnote{\url{http://www.naturalearthdata.com/}} dataset provides manually curated data of cultural and physical features of the world. Natural earth data is especially useful at higher levels when it matters alot what to display when.
+
+We use the following data from Natural Earth:
+
+\begin{itemize}
+\item Rankings of big cities
+\item Major lakes
+\item Country and administrative borders
+\end{itemize}

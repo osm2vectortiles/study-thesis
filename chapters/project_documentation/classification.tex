@@ -1,0 +1,86 @@
+\chapter{Classification}
+\label{classification}
+
+The OpenStreetMap tagging schema has developed into a complex taxonomy of real-world feature classes and objects. \cite[p. 15]{haklay2008openstreetmap}. Map designers don't want to design
+for each distinct object specifically which is why Mapbox and others abstract distinct key value pairs into so called feature classes.
+
+Mapbox calls those feature class simply class.
+
+Mapping created key value pairs into categories cannot be automated
+and there is no standard. This is why we have done it by hand.
+
+A map designer that wants to style agricultural areas does not care
+what type of field it is.
+
+\begin{table}[]
+\centering
+\caption{My caption}
+\label{my-label}
+\begin{tabular}{llll}
+Key      & Value      & Class       & Type           \\
+landuse  & farm       & agriculture & orchard        \\
+building & farm       & agriculture & farm           \\
+landuse  & farmland   & agriculture & farmland       \\
+landuse  & farmyard   & agriculture & farmyard       \\
+landuse  & allotments & agriculture & allotments     \\
+landuse  & vineyard   & agriculture & vineyard       \\
+landuse  & vineyard   & agriculture & plant\_nursery
+\end{tabular}
+\end{table}
+
+\section{Classification Format}
+
+We created the classifications in a YAML based format.
+Where each key in \texttt{classifications} denotes the classification name. The elements within each classification (e.g. \texttt{driveway} or \texttt{main} are the class name and the values below the class name (e.g. \texttt{primary}, \texttt{primary\_link} the OSM values to match. We do not explicitly match the OSM keys as well - only the values.
+
+\begin{yamlcode}
+classifications:
+  road:
+    highway:
+    - motorway
+    - motorway_link
+    - driveway
+    main:
+    - primary
+    - primary_link
+    - trunk
+    - trunk_link
+    - secondary
+    - secondary_link
+    - tertiary
+    - tertiary_link
+\end{yamlcode}
+
+\section{Code Generation}
+
+We take the readable classification format and generate immutable SQL
+functions we can use in our queries.
+The example above will result in the following function.
+
+\begin{sqlcode}
+CREATE OR REPLACE FUNCTION classify_road(type VARCHAR)
+RETURNS VARCHAR AS $$
+  BEGIN
+    RETURN CASE
+      WHEN type IN ('motorway','motorway_link','driveway') THEN 'highway'
+      WHEN type IN ('primary','primary_link',
+                    'trunk','trunk_link',
+                    'secondary','secondary_link',
+                    'tertiary','tertiary_link') THEN 'main'
+    END;
+  END;
+$$ LANGUAGE plpgsql IMMUTABLE;
+\end{sqlcode}
+
+\section{Use in Vector Tile Generation}
+
+Classifications are then baked into vector tile attributes
+of geometries.
+
+\begin{sqlcode}
+SELECT
+  geometry,
+  classify_road(type) AS class,
+  type AS type
+FROM osm_roads
+\end{sqlcode}

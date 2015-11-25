@@ -1,0 +1,52 @@
+\chapter{Relative Importance}
+\label{localrank}
+
+To reduce label density on lower zoom levels but still contain all data in e.g. zoom level 14 the \texttt{localrank} attribute indiciates how
+important a label is compared to the labels in its neighbourhood.
+
+\section{Calculating Rank}
+
+And then create the local rank for each tile in a 128 px grid when returning the POIs.
+
+In the best case scenario one would create a function that
+ranks each individual point of interest. In this case we only ranked the most important features.
+
+\subsection{Order Features by their Types}
+
+\begin{sqlcode}
+CREATE OR REPLACE FUNCTION localrank_poi(type VARCHAR) RETURNS INTEGER
+AS $$
+BEGIN
+  RETURN CASE
+    WHEN type IN ('station', 'subway_entrance', 'park',
+                  'cemetery', 'bank', 'supermarket', 'car',
+                  'library', 'university', 'college', 'police',
+                  'townhall', 'courthouse') THEN 2
+    WHEN type IN ('nature_reserve', 'garden', 'public_building') THEN 3
+    WHEN type IN ('stadium') THEN 90
+    WHEN type IN ('hospital') THEN 100
+    WHEN type IN ('zoo') THEN 200
+    WHEN type IN ('university', 'school', 'college', 'kindergarten') THEN 300
+    WHEN type IN ('supermarket', 'department_store') THEN 400
+    WHEN type IN ('nature_reserve', 'swimming_area') THEN 500
+    WHEN type IN ('attraction') THEN 600
+    ELSE 1000
+  END;
+END;
+$$ LANGUAGE plpgsql IMMUTABLE;
+\end{sqlcode}
+
+
+\subsection{Calculate Rank of Features}
+
+The rank is calculated across a grid of 128 pixels. Our most
+important features from the \texttt{localrank\_poi} function will
+also be the most relevant POIs.
+
+\begin{sqlcode}
+SELECT
+  geometry,
+  rank() OVER (PARTITION BY LabelGrid(geometry, 128 * !pixel_width!)
+               ORDER BY localrank_poi(type) ASC) AS localrank,
+FROM osm_poi
+\end{sqlcode}
