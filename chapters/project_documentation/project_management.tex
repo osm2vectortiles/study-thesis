@@ -1,6 +1,5 @@
 \chapter{Project Management}\label{project-management}
 
-\section{GitHub}\label{github}
 
 \section{Prototypen, Releases, Meilensteine}
 
@@ -12,123 +11,76 @@
 
 \section{Prozessmodell}
 
+We used GitHub for planning and tracking the tasks.
 
-
+Our sprints are organized into milestones and tasks were assigned to a milestone
 
 Managing tickets, milestones and progress all happens on the public
 GitHub repository.
 
+
+
 There are two GitHub repositories:
 
 \begin{itemize}
-\tightlist
 \item
   \textbf{osm2vectortile} contains the project
 \item
   \textbf{osm2vectortile-thesis} contains the thesis
 \end{itemize}
 
-\subsection{Development Environment}\label{development-environment}
+%---------------------------------------------------------------
+\newpage
+\chapter{Quality Measures}\label{quality-measures}
 
-Development happens independant.
+\section{Testing}\label{testing}
 
-\subsection{Version Control}\label{version-control}
-
-Git
-
-\subsection{Continuous Integration}\label{continuous-integration}
-
-TBD
-
-\section{Quality Measures}\label{quality-measures}
-
-\subsection{Documentation}\label{documentation}
-
-\subsection{Project Management}\label{project-management-2}
+Our ecosystem is quite a diverse one with a big collection of small
+tools that all work together. Therefore we use high level integration
+tests to ensure that our components work together.
 
 \section{Guidelines}\label{guidelines}
+To have a homogenous software we settled on common guidelines in 
+the beginning of the project.
 
-\subsection{Releases}\label{releases}
-
+\subsection{Releases}
 We use semantic versioning \footnote{\url{http://semver.org/}}. At the
-end of each iteration a new release will be created. We start at version
-\texttt{0.1.0}. The version number consists of a major, minor and patch
-version.
-
-\textbf{Major: }Incompatible changes
-
-\textbf{Minor: }Backwards compatible changes
-
-\textbf{Patch: }Bugfixes
+end of each milestone a new release will be created.
 
 \subsection{Git}\label{git}
-
-\subsubsection{Commit Messages}\label{commit-messages}
-
+\paragraph{Commit Messages}
 We use the seven rules of great git commit
 messages\footnote{\url{http://chris.beams.io/posts/git-commit/}}.
 
-\begin{itemize}
-\item
-  Separate subject from body with a blank line
-\item
-  Limit the subject line to 50 characters
-\item
-  Capitalize the subject line
-\item
-  Do not end the subject line with a period
-\item
-  Use the imperative mood in the subject line
-\item
-  Wrap the body at 72 characters
-\item
-  Use the body to explain what and why vs.~how
-\end{itemize}
-
-\subsubsection{History}\label{history}
-
-\paragraph{Rewriting}\label{rewriting}
-
+\paragraph{Rewriting}
 Git history should be kept clean and therefore local branches should be
 squashed meaningfully.
 
-\paragraph{Pulling}\label{pulling}
-
+\paragraph{Pulling}
 To avoid unnecessary merge messages one should always use the
 \texttt{-\/-rebase} parameter.
 
 \subsection{Workflow}\label{workflow}
-
-We use the Feature Branch
-Workflow\footnote{\url{https://www.atlassian.com/git/tutorials/comparing-workflows/feature-branch-workflow/}}.
+We use the Feature Branch Workflow\footnote{\url{https://www.atlassian.com/git/tutorials/comparing-workflows/feature-branch-workflow/}}.
 
 Every project member has a local repository with a copy of the remote
-repository (GitHub). For each feature ticket in GitHub a separate branch
+repository. For each feature ticket in GitHub a separate branch
 will be created. Once a ticket has been completed a pull request will be
-created and needs to be merged into the Master branch by an other team
-member.
+created and needs to be merged into the \texttt{master} branch by an other 
 
-Every team member is responsible that the code is reviewed by the other
-team mebmer. The reviewer will add his comments to the pull requst
-comment section. As soon as all issues have been resolved and continuous
-integrations runs successfully the branch will be merged into master.
+\subsection{Coding Standards}
 
-\subsection{Coding Standards}\label{coding-standards}
+\paragraph{Bash} We use Bash for our Docker image entrypoints and follow
+the rules of Defensive Bash Programming \footnote{\url{http://www.kfirlavi.com/blog/2012/11/14/defensive-bash-programming/}}.
 
-\subsection{Testing}\label{testing}
+\paragraph{Python} For Python code we want to stay PEP-8\footnote{\url{https://www.python.org/dev/peps/pep-0008/}} compliant and write idiomatic Python code according to PEP-20\footnote{\url{https://www.python.org/dev/peps/pep-0020/}}.
 
-\subsubsection{Unit Tests}\label{unit-tests}
+\paragraph{JavaScript}
 
-At the moment there is no need for unit tests.
 
-\subsubsection{Integration Tests}\label{integration-tests}
+\paragraph{SQL} Our PostgreSQL code is using upper case for the key words. Apart from that we try to have nice formatted SQL code and use functions
+if necessary to keep the queries DRY\footnote{\url{https://en.wikipedia.org/w/index.php?title=Don%27t_repeat_yourself&oldid=691047461}}.
 
-To guarantee our solution works we will create a few completly
-integrated integration tests that cover our core use cases.
+\paragraph{Dockerfile} Dockerfiles follow the best practices\footnote{\url{https://docs.docker.com/engine/articles/dockerfile_best-practices/}} defined by Docker.
 
-\section{Planning}\label{planning}
-
-\subsection{Work Schedule}\label{work-schedule}
-
-The planning process defies the milestones and bigger tasks that need to
-be resolved.
+%---------------------------------------------------------------

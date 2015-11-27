@@ -6,24 +6,21 @@ They provide many open source tools to manage vector tiles. We tried not to impl
 
 \section{Vector Tile Rendering}
 
-\paragraph{Data Style} What is a datastyle (tm2source)
+\paragraph{Data Style} The data style is a description of the different feature sets such as landuse, water or roads together with its sql query. The sql query defines which data needs to be fetched on which zoomlevel.
 
-The figure shows the high level workflow of the vector tile rendering process. The following section describes the figure below.
-
+The figure below shows the high level workflow of the vector tile rendering process. On the left side are the data sources, which get imported into a Postgis database. The import tools map the data sources to a database table and create indices for fast querying during the rendering process.
+The vector tile renderer takes the data style as input and queries the PostGIS database for the required feature sets necessary for one vector tile.
 
 
 \begin{figure}[h]
   \centering
-  \includegraphics[width=1\textwidth]{images/osm2vectortiles.png}
-  \caption{On the left side are the data sources, which get imported into a Postgis database. The import tools (imposm, shp2pgsql) map the data to a database table.
-The data source (OSM bright tm2source in figure) defines different feature sets(landuse, water, roads etc.) together with a sql query.
-Tilelive-copy takes the data source as input, executes the different sql queries and deliveres the queried OSM data to the mapnik rendering engine. Mapnik takes the OSM data and outputs vector tiles.
-  }
+  \includegraphics[width=1\textwidth]{images/vector_tile_rendering.png}
+  \caption{Vector Tile Rendering Process}
 \end{figure}
 
 \section{Tile Server}
 
-\paragraph{Visual Style} What is a visual style
+\paragraph{Visual Style} The visual style defines how a feature set such as landuse actually looks. In the case of landuse on could define the texture, color of the border and area.
 
 \subsection{Raster Tile Server}
 
@@ -32,12 +29,18 @@ The raster tile server makes it possible to view the vector tiles. The output of
 \begin{figure}[h]
 
   \centering
-  \includegraphics[width=1\textwidth]{images/rastertiles-server.png}
-  \caption{Flow diagram of import and export process.}
+  \includegraphics[width=1\textwidth]{images/raster_tile_server.png}
+  \caption{Raster tile server}
 \end{figure}
 
 \subsection{Vector Tile Server}
 
+\begin{figure}[h]
+
+  \centering
+  \includegraphics[width=1\textwidth]{images/vector_tile_server.png}
+  \caption{Vector tile server}
+\end{figure}
 
 
 
