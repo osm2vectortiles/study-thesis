@@ -1,0 +1,179 @@
+\chapter{Implementation}\label{implementation}
+
+\section{Data Sources}
+\label{data-sources}
+
+Making a map involves finding the right data slice in the right
+data sources.
+
+\subsection{OpenStreetMap}
+
+The biggest part of our data originates from published OpenStreetMap snapshots. The OpenStreetMap data is used to provide the detailed parts of the map and is the cornerstone of the entire map.
+
+We import selected key value pairs and their geometries of the entire OpenStreetMap database from Planet OSM \footnote{\url{http://planet.osm.org/}}.
+
+
+\subsection{Curated OpenStreetMap Data}
+
+Certain OpenStreetMap data like borders and land polygons are very sensitive for change.
+The OpenStreetMapData\footnote{\url{http://openstreetmapdata.com/}}
+project takes care of alot of issues that happen with coastlines
+and provide it in a convenient format.
+
+We use the following data from OpenStreetMapData:
+
+\begin{itemize}
+\item Water polygons
+\end{itemize}
+
+\section{Natural Earth}
+
+The Natural Earth \footnote{\url{http://www.naturalearthdata.com/}} dataset provides manually curated data of cultural and physical features of the world. Natural earth data is especially useful at higher levels when it matters alot what to display when.
+
+We use the following data from Natural Earth:
+
+\begin{itemize}
+\item Rankings of big cities
+\item Major lakes
+\item Country and administrative borders
+\end{itemize}
+
+\section{Classification}
+\label{classification}
+
+The OpenStreetMap tagging schema has developed into a complex taxonomy of real-world feature classes and objects. \cite[p. 15]{haklay2008openstreetmap}. Map designers don't want to design
+for each distinct object specifically which is why Mapbox and others abstract distinct key value pairs into so called feature classes.
+
+Mapbox calls those feature class simply class.
+
+Mapping created key value pairs into categories cannot be automated
+and there is no standard. This is why we have done it by hand.
+
+A map designer that wants to style agricultural areas does not care
+what type of field it is.
+
+\begin{table}[]
+\centering
+\caption{My caption}
+\label{my-label}
+\begin{tabular}{llll}
+Key      & Value      & Class       & Type           \\
+landuse  & farm       & agriculture & orchard        \\
+building & farm       & agriculture & farm           \\
+landuse  & farmland   & agriculture & farmland       \\
+landuse  & farmyard   & agriculture & farmyard       \\
+landuse  & allotments & agriculture & allotments     \\
+landuse  & vineyard   & agriculture & vineyard       \\
+landuse  & vineyard   & agriculture & plant\_nursery
+\end{tabular}
+\end{table}
+
+\subsection{Classification Format}
+
+We created the classifications in a YAML based format.
+Where each key in \texttt{classifications} denotes the classification name. The elements within each classification (e.g. \texttt{driveway} or \texttt{main} are the class name and the values below the class name (e.g. \texttt{primary}, \texttt{primary\_link} the OSM values to match. We do not explicitly match the OSM keys as well - only the values.
+
+\begin{yamlcode}
+classifications:
+  road:
+    highway:
+    - motorway
+    - motorway_link
+    - driveway
+    main:
+    - primary
+    - primary_link
+    - trunk
+    - trunk_link
+    - secondary
+    - secondary_link
+    - tertiary
+    - tertiary_link
+\end{yamlcode}
+
+\subsection{Code Generation}
+
+We take the readable classification format and generate immutable SQL
+functions we can use in our queries.
+The example above will result in the following function.
+
+\begin{sqlcode}
+CREATE OR REPLACE FUNCTION classify_road(type VARCHAR)
+RETURNS VARCHAR AS $$
+  BEGIN
+    RETURN CASE
+      WHEN type IN ('motorway','motorway_link','driveway') THEN 'highway'
+      WHEN type IN ('primary','primary_link',
+                    'trunk','trunk_link',
+                    'secondary','secondary_link',
+                    'tertiary','tertiary_link') THEN 'main'
+    END;
+  END;
+$$ LANGUAGE plpgsql IMMUTABLE;
+\end{sqlcode}
+
+\subsection{Use in Vector Tile Generation}
+
+Classifications are then baked into vector tile attributes
+of geometries.
+
+\begin{sqlcode}
+SELECT
+  geometry,
+  classify_road(type) AS class,
+  type AS type
+FROM osm_roads
+\end{sqlcode}
+
+\section{Relative Importance}
+\label{localrank}
+
+To reduce label density on lower zoom levels but still contain all data in e.g. zoom level 14 the \texttt{localrank} attribute indiciates how
+important a label is compared to the labels in its neighbourhood.
+
+\subsection{Calculating Rank}
+
+And then create the local rank for each tile in a 128 px grid when returning the POIs.
+
+In the best case scenario one would create a function that
+ranks each individual point of interest. In this case we only ranked the most important features.
+
+\subsubsection{Order Features by their Types}
+
+\begin{sqlcode}
+CREATE OR REPLACE FUNCTION localrank_poi(type VARCHAR) RETURNS INTEGER
+AS $$
+BEGIN
+  RETURN CASE
+    WHEN type IN ('station', 'subway_entrance', 'park',
+                  'cemetery', 'bank', 'supermarket', 'car',
+                  'library', 'university', 'college', 'police',
+                  'townhall', 'courthouse') THEN 2
+    WHEN type IN ('nature_reserve', 'garden', 'public_building') THEN 3
+    WHEN type IN ('stadium') THEN 90
+    WHEN type IN ('hospital') THEN 100
+    WHEN type IN ('zoo') THEN 200
+    WHEN type IN ('university', 'school', 'college', 'kindergarten') THEN 300
+    WHEN type IN ('supermarket', 'department_store') THEN 400
+    WHEN type IN ('nature_reserve', 'swimming_area') THEN 500
+    WHEN type IN ('attraction') THEN 600
+    ELSE 1000
+  END;
+END;
+$$ LANGUAGE plpgsql IMMUTABLE;
+\end{sqlcode}
+
+
+\subsubsection{Calculate Rank of Features}
+
+The rank is calculated across a grid of 128 pixels. Our most
+important features from the \texttt{localrank\_poi} function will
+also be the most relevant POIs.
+
+\begin{sqlcode}
+SELECT
+  geometry,
+  rank() OVER (PARTITION BY LabelGrid(geometry, 128 * !pixel_width!)
+               ORDER BY localrank_poi(type) ASC) AS localrank,
+FROM osm_poi
+\end{sqlcode}

@@ -22,9 +22,9 @@
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-%----------------------------------------------------------------------------------------
+%------------------------------------------------
 %	PACKAGES AND OTHER DOCUMENT CONFIGURATIONS
-%----------------------------------------------------------------------------------------
+%------------------------------------------------
 
 \documentclass[
 		twoside,openright,titlepage,numbers=noenddot,headinclude,%1headlines,
@@ -75,22 +75,26 @@
 \part{Technical Report} % First part of the thesis
 \include{chapters/technical_report/introduction}
 \include{chapters/technical_report/state_of_technology}
-\include{chapters/technical_report/rating}
 \include{chapters/technical_report/implementation_concept}
 \include{chapters/technical_report/results_and_future}
 
 \newpage
 %------------------------------------------------
 \part{Project Documentation}
+\include{chapters/project_documentation/vision}
+\include{chapters/project_documentation/requirements_specification}
+\include{chapters/project_documentation/evaluation}
+\include{chapters/project_documentation/analysis}
+\include{chapters/project_documentation/project_management}
+\include{chapters/project_documentation/project_monitoring}
+
 %------------------------------------------------
 \part{Evaluation}
 \include{chapters/project_documentation/data_sources}
-\include{chapters/project_documentation/history_of_webmaps}
-\include{chapters/project_documentation/classification}
-\include{chapters/project_documentation/localrank}
 %------------------------------------------------
 \newpage
-\part{Development Process}
+\part{Software Documentation}
+\include{chapters/software_documentation/layer_reference}
 
 %------------------------------------------------
 %	THESIS CONTENT - APPENDICES

@@ -1,0 +1,134 @@
+\chapter{Project Management}\label{project-management}
+
+\section{GitHub}\label{github}
+
+\section{Prototypen, Releases, Meilensteine}
+
+\section{Roles and Responsibilities}\label{roles-and-responsibilities}
+
+\section{Aufwandschätzung, Zeitplan, Projektplan}
+
+\section{Risks}\label{risks}
+
+\section{Prozessmodell}
+
+
+
+
+Managing tickets, milestones and progress all happens on the public
+GitHub repository.
+
+There are two GitHub repositories:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{osm2vectortile} contains the project
+\item
+  \textbf{osm2vectortile-thesis} contains the thesis
+\end{itemize}
+
+\subsection{Development Environment}\label{development-environment}
+
+Development happens independant.
+
+\subsection{Version Control}\label{version-control}
+
+Git
+
+\subsection{Continuous Integration}\label{continuous-integration}
+
+TBD
+
+\section{Quality Measures}\label{quality-measures}
+
+\subsection{Documentation}\label{documentation}
+
+\subsection{Project Management}\label{project-management-2}
+
+\section{Guidelines}\label{guidelines}
+
+\subsection{Releases}\label{releases}
+
+We use semantic versioning \footnote{\url{http://semver.org/}}. At the
+end of each iteration a new release will be created. We start at version
+\texttt{0.1.0}. The version number consists of a major, minor and patch
+version.
+
+\textbf{Major: }Incompatible changes
+
+\textbf{Minor: }Backwards compatible changes
+
+\textbf{Patch: }Bugfixes
+
+\subsection{Git}\label{git}
+
+\subsubsection{Commit Messages}\label{commit-messages}
+
+We use the seven rules of great git commit
+messages\footnote{\url{http://chris.beams.io/posts/git-commit/}}.
+
+\begin{itemize}
+\item
+  Separate subject from body with a blank line
+\item
+  Limit the subject line to 50 characters
+\item
+  Capitalize the subject line
+\item
+  Do not end the subject line with a period
+\item
+  Use the imperative mood in the subject line
+\item
+  Wrap the body at 72 characters
+\item
+  Use the body to explain what and why vs.~how
+\end{itemize}
+
+\subsubsection{History}\label{history}
+
+\paragraph{Rewriting}\label{rewriting}
+
+Git history should be kept clean and therefore local branches should be
+squashed meaningfully.
+
+\paragraph{Pulling}\label{pulling}
+
+To avoid unnecessary merge messages one should always use the
+\texttt{-\/-rebase} parameter.
+
+\subsection{Workflow}\label{workflow}
+
+We use the Feature Branch
+Workflow\footnote{\url{https://www.atlassian.com/git/tutorials/comparing-workflows/feature-branch-workflow/}}.
+
+Every project member has a local repository with a copy of the remote
+repository (GitHub). For each feature ticket in GitHub a separate branch
+will be created. Once a ticket has been completed a pull request will be
+created and needs to be merged into the Master branch by an other team
+member.
+
+Every team member is responsible that the code is reviewed by the other
+team mebmer. The reviewer will add his comments to the pull requst
+comment section. As soon as all issues have been resolved and continuous
+integrations runs successfully the branch will be merged into master.
+
+\subsection{Coding Standards}\label{coding-standards}
+
+\subsection{Testing}\label{testing}
+
+\subsubsection{Unit Tests}\label{unit-tests}
+
+At the moment there is no need for unit tests.
+
+\subsubsection{Integration Tests}\label{integration-tests}
+
+To guarantee our solution works we will create a few completly
+integrated integration tests that cover our core use cases.
+
+\section{Planning}\label{planning}
+
+\subsection{Work Schedule}\label{work-schedule}
+
+The planning process defies the milestones and bigger tasks that need to
+be resolved.

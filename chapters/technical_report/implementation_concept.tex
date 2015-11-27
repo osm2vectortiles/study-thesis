@@ -1,29 +1,44 @@
 \chapter{Implementation Concept}
 
-All objectives which we defined in \hyperref[targets]{\emph{section 1.2}} have been achieved. The optional target to provide vector tiles for the whole world has been moved to our bachelor thesis.
+The most promising vector tiles specification was proposed by Mapbox.
+\marginpar{The Mapbox Vector Tile Specification is compared with other vector tile formats in chapter \ref{vector-tile-formats}}
+They provide many open source tools to manage vector tiles. We tried not to implement tools which already exists and instead use as many existing tools as possible. Because of this our implementation consists mostly of docker containers which do a specific task.
 
-\section{Results}
+\section{Vector Tile Rendering}
 
-\begin{itemize}
-\item
-  We created Docker Containers for every task in the process of creating vector tiles.
-\item
-  We created a vector tile server to serve the vector tiles together with a visual style.
-\item
-  We provide a project website with information on how to use our vector tiles.
-\end{itemize}
+\paragraph{Data Style} What is a datastyle (tm2source)
 
-The vector tiles for Switzerland can be downloaded from our project website (http://osm2vectortiles.org). These vector tiles can be served together with a visual style in our vector tiles server.
+The figure shows the high level workflow of the vector tile rendering process. The following section describes the figure below.
 
-A custom visual style can be created with Mapbox Studio Classic\footnote{\url{https://www.mapbox.com/mapbox-studio-classic/}}.
 
-\section{Future}
-In a first step the project should be expanded to provide vector tiles for the entire world. We need to figure out how we can scale our vector tile rendering workflow.
 
-When we presented our project to members of the Swiss OSM community, they asked if the vector tiles get updated. There should definitely be a way to identify and rerender outdated vector tiles.
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=1\textwidth]{images/osm2vectortiles.png}
+  \caption{On the left side are the data sources, which get imported into a Postgis database. The import tools (imposm, shp2pgsql) map the data to a database table.
+The data source (OSM bright tm2source in figure) defines different feature sets(landuse, water, roads etc.) together with a sql query.
+Tilelive-copy takes the data source as input, executes the different sql queries and deliveres the queried OSM data to the mapnik rendering engine. Mapnik takes the OSM data and outputs vector tiles.
+  }
+\end{figure}
 
-As the long-term vision of this project is to provide a complete offline map, we would like to implement basic GeoName search.
+\section{Tile Server}
 
-This suggests will be the project goals for our bachelor thesis.
+\paragraph{Visual Style} What is a visual style
+
+\subsection{Raster Tile Server}
+
+The raster tile server makes it possible to view the vector tiles. The output of the vector tile rendering process is just the raw vector data. To view the vector tiles we need a visual style, which defines how the defined feature sets in the data source should look like. The visual style defines for example that the feature set landuse should have a green color or that water should be blue. In the figure below we can see on the left side our vector tiles (mbtiles) and the visual style (TM2 Style). Tessera takes these two items and delivers them to mapnik which generates raster tiles. Tessera automatically starts a webserver and serves the generated raster tiles.
+
+\begin{figure}[h]
+
+  \centering
+  \includegraphics[width=1\textwidth]{images/rastertiles-server.png}
+  \caption{Flow diagram of import and export process.}
+\end{figure}
+
+\subsection{Vector Tile Server}
+
+
+
 
 \newpage
