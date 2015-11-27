@@ -7,9 +7,39 @@
 
 
 %------------------------------------------------------
-\section{Domain Model}
+\section{Domain Model}\label{domain-model}
 
+The goal in our database schema 
 
+\subsection{Tables}
+
+The schema is flat and has no relations. Each table contains
+information about its entity and geometry. Because imposm 3
+cannot match two types of polygons (e.g. polygon and point) we need
+to create a table for each geometry type.
+
+\begin{center}
+    \begin{tabular}{lll}
+    \hline
+    Table Name            & Geometry Type & Description \\
+    \hline                                          
+    admin                  & linestring    & Administrative boundaries \\
+    aero\_lines            & linestring    & Airports and aviation-related items        \\
+    barrier\_lines         & linestring    & Movement blocking structures   \\
+    buildings              & polygon       & Building shapes                            \\
+    housenumbers\_points   & point         & Address information about houses \\
+    landusages             & polygon       & Human use of land \\
+    places                 & point         & Populated settlements                      \\
+    poi\_points            & point         & Point of interest                          \\
+    roads                  & linestring    & Roads, tracks and paths          \\
+    water\_lines           & linestring    & Lakes and rivers                           \\
+    barrier\_polygons      & polygon       & see barrier\_lines                         \\
+    aero\_polygons         & polygon       & see aero\_lines                            \\
+    water\_polygons        & polygon       & see water\_lines                           \\
+    poi\_polygons          & polygon       & see poi\_points                            \\
+    housenumbers\_polygons & polygon       & see housenumbers\_points                   \\
+    \end{tabular}
+\end{center}
 
 %------------------------------------------------------
 \section{Package Diagrams}
@@ -44,38 +74,6 @@ read and write than the bzipped OSM XML version.
 \paragraph{Second step: Importing OSM data into
 Postgis}\label{second-step-importing-osm-data-into-postgis}
 
-As with the data sources there are many possiblities to import and store
-OSM data. The database type and importing schema should be choosen based
-on the primary use case. Since the goal of this workflow is to render
-vector tiles, our primary use case is rendering. The OSM community
-recommends\footnote{\url{http://wiki.openstreetmap.org/wiki/Databases_and_data_access_APIs}}
-PostgreSQL with the Postgis extension and imposm or osm2pgsql as schema.
-
-\subparagraph{imposm importer}\label{imposm-importer}
-
-Imposm is an import tool for osm data, it is not a schema. But it
-defines a default
-schema\footnote{\url{http://imposm.org/docs/imposm/latest/database_schema.html}},
-which could possibly be changed by provinding a custom mapping file. An
-advantage of the default schema is that it groups data thematically into
-tables. Which results in smaller tables and simpler queries. Imposm 3
-supports updating the database from OSM diff
-files\footnote{\url{http://imposm.org/docs/imposm3/latest/tutorial.html\#diff}}
-
-\subparagraph{osm2pgsql importer}\label{osm2pgsql-importer}
-
-Osm2pgsql is must commonly used to import OSM data for the rendering use
-case. The import schema is also called osm2pgsql and defines a very
-simple schema(line, point, polygon and
-roads)\footnote{\url{http://wiki.openstreetmap.org/wiki/Osm2pgsql/schema}}.
-This results in very large tables, so it is recommended to create good
-indices. Osm2pgsql supports updating of the database, if the values have
-been stored as hstore.
-
-For our use case it is important, that the import is efficent and that
-the import tool supports updating based on OSM diff files. Imposm 3 is
-faster than osm2pgsql and supports updatability. So we decided to take
-imposm for importing.
 
 \subsubsection{Third step: Mapbox studio source
 project}\label{third-step-mapbox-studio-source-project}
@@ -110,5 +108,3 @@ tilelive-copy --bounds=-180,-85,180,85 bridge:///home/mapbox/tmp/project.tm2sour
 tilelive-copy provides the Mapnik XML file and the extent to mapnik
 which then generates the vector tiles. Tilelive-copy outputs these
 vector tiles in the mbtiles container.
-
-%------------------------------------------------------

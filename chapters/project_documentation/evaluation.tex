@@ -1,1 +1,111 @@
-\section{Technology Evaluation}
+\chapter{Technology Evaluation}
+
+\section{Spatial Database}
+
+PostGIS was the only viable choice due to superbe tooling support.
+
+\section{OSM Import Tool}\label{osm-import-tool}
+The OSM community
+recommends\footnote{\url{http://wiki.openstreetmap.org/wiki/Databases_and_data_access_APIs}}
+PostgreSQL with the Postgis extension and imposm or osm2pgsql as import tool.
+
+\subsection{Criterias}
+
+\paragraph{Speed} 
+In order to iterate fast and be able to change the data style frequently
+it is important that the import tool is reasonably fast and is able
+to import the OSM planet file in one single day.
+
+\paragraph{Customized Schema}
+Customizing a schema to already split up features into separate tables
+makes querying more performant and easier to do.
+
+\paragraph{Diff Updates}
+It must be possible to applying Planet diffs \footnote{\url{http://wiki.openstreetmap.org/wiki/Planet.osm/diffs}} 
+to continuously update the database with newer data.
+
+If a import is very fast it is also possible to simply reimport the latest
+planet dump.
+
+\paragraph{Existing Data Style Projects}
+In order to get started it is helpful to have alot of query example
+from other data style projects available.
+
+\subsection{Evaluation Matrix}
+
+\begin{center}
+    \begin{tabular}{llll}
+    \hline
+    Criteria         & Weight & imposm & osm2pgsql \\
+    \hline
+    Speed             & 0,3    & 8      & 5         \\
+    Customized Schema & 0,4    & 7      & 4         \\
+    Diff Updates      & 0,2    & 6      & 8         \\
+    Existing Material & 0,1    & 6      & 10        \\
+    \hline
+    \textbf{Weighted Score} & 1      & 7      & 5,7       \\
+    \end{tabular}
+\end{center}
+
+
+\subsection{osm2pgsql}\label{osm2pgsql-importer}
+
+osm2pgsql \footnote{\url{http://wiki.openstreetmap.org/wiki/Osm2pgsql}} is the
+most commonly used import tool for processing raw OpenStreetMap data into PostGIS.
+The import schema is also called osm2pgsql and defines a very
+simple schema(line, point, polygon and
+roads)\footnote{\url{http://wiki.openstreetmap.org/wiki/Osm2pgsql/schema}}.
+This results in very large tables, so it is recommended to create good
+indices. Osm2pgsql supports updating of the database, if the values have
+been stored as hstore.
+
+The schema can be adapted via the import style \footnote{\url{http://wiki.openstreetmap.org/wiki/Osm2pgsql#Import_style}}
+but most projects use the default style\footnote{\url{https://github.com/openstreetmap/osm2pgsql/blob/master/default.style}} provided by osm2pgsql.
+
+For our use case it is important, that the import is efficent and that
+the import tool supports updating based on OSM diff files. Imposm 3 is
+faster than osm2pgsql and supports updatability. So we decided to take
+imposm for importing.
+
+\subsection{Imposm 3 }\label{imposm-importer}
+
+Imposm is an import tool for osm data, it is not a schema. But it
+defines a default
+schema\footnote{\url{http://imposm.org/docs/imposm/latest/database_schema.html}},
+which could possibly be changed by provinding a custom mapping file. An
+advantage of the default schema is that it groups data thematically into
+tables. Which results in smaller tables and simpler queries. Imposm 3
+supports updating the database from OSM diff
+files\footnote{\url{http://imposm.org/docs/imposm3/latest/tutorial.html\#diff}}
+
+TODO: formulate decision
+
+\section{Vector Tile Format}\label{vector-tile-formats}
+
+Vector tiles is quite a broad term. If we talk about vector tiles in thesis we usually mean Mapbox vector tiles which is just a custom open specification how vector tiles should be structured.
+
+\paragraph{Mapbox Vector Tiles}
+
+When Mapbox introduced it's geography tool Mapbox Studio in 2013 they
+created the \emph{Mapbox Vector Tiles Specification}
+\footnote{\url{https://github.com/mapbox/vector-tile-spec}} which is
+implemented by a variety of tools and clients
+\footnote{\url{https://github.com/mapbox/awesome-vector-tiles}}
+including \emph{Mapbox GL JS}, \emph{Open Layers 3}, \emph{Leaflet},
+\emph{Mapzen Tangram} and Esri
+\footnote{\url{https://www.mapbox.com/blog/vector-tile-adoption/}} in
+the future.
+
+\paragraph{Geopackage}
+
+The \emph{GeoPackage Encoding Standard} is the OGC counterpart to the
+\emph{Mapbox Vector Tiles Specification} which was introduced later and
+is supported by QGIS, ESRI and GDAL.
+
+\paragraph{Google Maps}
+
+Google Maps is using vector tiles since 2010 under the hood and was the
+first provider implementing this. Styling is limited and the format
+proprietary.
+
+TODO: formulate decision

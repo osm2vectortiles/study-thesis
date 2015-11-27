@@ -1,5 +1,9 @@
 \chapter{Implementation}\label{implementation}
 
+The most promising vector tile specification was proposed by Mapbox.
+\marginpar{The Mapbox Vector Tile Specification is compared with other vector tile formats in chapter \ref{vector-tile-formats}}
+They provide many open source tools to manage vector tiles. We tried not to implement tools which already exists and instead use as many existing tools as possible. Because of this our implementation consists mostly of docker containers which do a specific task.
+
 \section{Data Sources}
 \label{data-sources}
 
@@ -177,3 +181,38 @@ SELECT
                ORDER BY localrank_poi(type) ASC) AS localrank,
 FROM osm_poi
 \end{sqlcode}
+
+\section{Zoomlevel Reference}\label{zoomlevel_reference}
+
+% Please add the following required packages to your document preamble:
+% \usepackage{graphicx}
+\begin{table}[]
+\centering
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{l|ccccccccccccccc}
+ & \multicolumn{1}{l}{z0} & \multicolumn{1}{l}{z1} & \multicolumn{1}{l}{z2} & \multicolumn{1}{l}{z3} & \multicolumn{1}{l}{z4} & \multicolumn{1}{l}{z5} & \multicolumn{1}{l}{z6} & \multicolumn{1}{l}{z7} & \multicolumn{1}{l}{z8} & \multicolumn{1}{l}{z9} & \multicolumn{1}{l}{z10} & \multicolumn{1}{l}{z11} & \multicolumn{1}{l}{z12} & \multicolumn{1}{l}{z13} & \multicolumn{1}{l}{z14} \\ \hline
+landuse &  &  &  &  &  & x & x & x & x & x & x & x & x & x & x \\
+waterway &  &  &  &  &  &  &  &  & x & x & x & x & x & x & x \\
+water & x & x & x & x & x & x & x & x & x & x & x & x & x & x & x \\
+aeroway &  &  &  &  &  &  &  &  &  &  &  &  & x & x & x \\
+barrier\_line &  &  &  &  &  &  &  &  &  &  &  &  &  &  & x \\
+building &  &  &  &  &  &  &  &  &  &  &  &  &  & x & x \\
+landuse\_overlay &  &  &  &  &  &  &  & x & x & x & x & x & x & x & x \\
+tunnel &  &  &  &  &  &  &  &  &  &  &  & x & x & x & x \\
+road &  &  &  &  &  & x & x & x & x & x & x & x & x & x & x \\
+bridge &  &  &  &  &  &  &  &  &  &  &  &  & x & x & x \\
+admin & x & x & x & x & x & x & x & x & x & x & x & x & x & x & x \\
+country\_label &  & x & x & x & x & x & x & x & x & x & x & x & x & x & x \\
+marine\_label &  & x & x & x & x & x & x & x & x & x & x & x & x & x & x \\
+state\_label &  &  &  &  & x & x & x & x & x & x & x & x & x & x & x \\
+place\_label &  &  &  &  & x & x & x & x & x & x & x & x & x & x & x \\
+water\_label &  &  &  &  &  &  &  &  &  &  & x & x & x & x & x \\
+poi\_label &  &  &  &  &  &  &  &  &  &  &  &  &  &  & x \\
+road\_label &  &  &  &  &  &  &  &  & x & x & x & x & x & x & x \\
+waterway\_label &  &  &  &  &  &  &  &  & x & x & x & x & x & x & x \\
+housenum\_label &  &  &  &  &  &  &  &  &  &  &  &  &  &  & x
+\end{tabular}
+}
+\caption{Shows which feature set is included on which zoom level}
+\label{my-label}
+\end{table}

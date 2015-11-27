@@ -19,23 +19,16 @@ There are two user groups interested in this project:
 \section{Actors and Stakeholders}
 \label{actors-and-stakeholders}
 
-\section{Use Cases}
-\label{use-cases}
-
-NOTE: I actually found use cases to be not so useful in SE2 project. But
-somehow this project is not as ``imaginable'' as a web application.
-Perhaps short uses cases are still a good idea.
-
-But perhaps this should be done more in the form of user stories (a bit
-more informal).
+\section{User Stories}
+\label{user-stories}
+\paragraph{Serverside Rendering}
+A System Administrator 
 
 \section{Non Functional Requirements}
 \label{non-functional-requirements}
 
 The most important NFR in this scenario is usability. If we cannot get
 usability right no one will use our solution.
-
-\paragraph{Usability}
 
 \paragraph{Learnability}
 
@@ -49,6 +42,8 @@ updates regularly.
 
 \paragraph{Performance}
 
-The tileserver needs to be reasonably fast but not highly performant.
+The tileserver must handle 10 concurrent user per second.
 
-TODO: Tell numbers
+\paragraph{Compatibility}
+
+The vector tiles must contain all feature sets Mapbox Streets contain. If we can guarantee full compatibility with Mapbox Streets\footnote{\url{https://www.mapbox.com/developers/vector-tiles/mapbox-streets-v6/}}} all Mapbox visual styles can be used with our vector tiles.
