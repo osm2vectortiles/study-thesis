@@ -136,6 +136,34 @@ levels.
 \newpage
 \section{Layer Schema}\label{layer-schema}
 
+\begin{flushleft}
+    \begin{tabular}{ll}
+    \hline
+     Layer             & Description                     \\
+    \hline
+    \#landuse          & Both land-use and land-cover.   \\
+    \#waterway         & Rivers                          \\
+    \#water            & Oceans and seas                 \\
+    \#aeroway          & Aero related lines and polygons \\
+    \#barrier\_line    & Barrier lines and polygons      \\
+    \#building         & Building polygons               \\
+    \#landuse\_overlay & Transparent overlays for water  \\
+    \#tunnel           & Tunnels                         \\
+    \#road             & Roads                           \\
+    \#bridge           & Bridges                         \\
+    \#admin            & Administrative borders          \\
+    \#country\_label   & Labels of countries             \\
+    \#marine\_label    & Labels of oceans and seas       \\
+    \#place\_label     & Labels of places                \\
+    \#water\_label     & Labels of lakes                 \\
+    \#poi\_label       & Labels of point of interest     \\
+    \#road\_label      & Labels of roads                 \\
+    \#waterway\_label  & Labels of rivers                \\
+    \#housenum\_label  & Labels of housenumbers          \\
+    \end{tabular}
+\end{flushleft}
+
+\newpage
 \subsection{Aeroways, Barriers and Landusages}
 
 For alot of layers linestring and polygon data needs to be converted into
@@ -210,7 +238,23 @@ from natural earth.
 
 \subsection{Import}
 
-The import is split up into several subimports which all use different data sources.
+The entire import process is a combination of different smaller imports of different datasources.
+
+\paragraph{import-osm-data}
+Import of the OSM planet file with imposm 3 and a custom mapping configuration.
+
+\paragraph{import-sql}
+Custom SQL functions that make querying easier and generated SQL code for
+classifications.
+
+\paragraph{import-natural-earth}
+Import of Natural Earth data.
+
+\paragraph{import-scaleranks}
+Custom scalerank updates from Natural Earth data for better scaleranks in places.
+
+\paragraph{import-water}
+Water polygons from OpenStreetMapData.
 
 \begin{figure}[h]
   \includegraphics[scale=0.6]{images/import_package.png}
@@ -221,6 +265,24 @@ The import is split up into several subimports which all use different data sour
 \subsection{Export}
 Export can either be done locally which will process one bounding box or
 split up into several machines using remote features.
+
+\paragraph{open-streets.tm2source}
+The data style project is the most essential component which pulls together all the
+data of different datasources to create vector tile. 
+
+\paragraph{export-local}
+A process which is using the open-streets.tm2source project to create vector tiles for a
+given bounding box.
+
+\paragraph{export-remote}
+A worker implementation which uses a queue to read jobs and work through jobs with
+export-local.
+
+\paragraph{enqueue-jobs}
+Create jobs for certain areas automatically.
+
+\paragraph{merge}
+Merge results of jobs together into a final big file.
 
 \begin{figure}[h]
   \includegraphics[scale=0.6]{images/export_package.png}
