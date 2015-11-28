@@ -15,9 +15,45 @@ information about its entity and geometry. Because imposm 3
 cannot match two types of polygons (e.g. polygon and point) we need
 to create a table for each geometry type.
 
+
+\subsection{Common Attributes}
+
+\subsubsection{OSM id}
+
+All tables and views that are derived from \osm{} data have keep the original \texttt{osm\_id}
+to trace back the data and be able to query a distinct \osm{} feature in a visual style.
+
+\subsubsection{Translations}
+
+All features that will get a label layer will contain several translations.
+
+\begin{flushleft}
+\begin{table}
+    \begin{tabular}{ll}
+    \hline
+     Field    & 	Description                                    \\
+    \hline
+    name      & Local name for the place.  \\
+    name\_en	 & English                          \\
+    name\_es	 & Spanish                          \\
+    name\_fr	 & French                           \\
+    name\_de	 & German                           \\
+    name\_ru	 & Russian                          \\
+    name\_zh	 & Chinese                          \\
+    \end{tabular}
+\end{table}
+\end{flushleft}
+
+
+\subsubsection{Type and Class}
+
+The class can be explained as a feature class. It is a categorization of a OSM value.
+The type is the OSM value of the feature.
+
+
 \subsection{OpenStreetMap Planet}
 
-\begin{center}
+\begin{flushleft}
     \begin{tabular}{lll}
     \hline
     Table Name            & Geometry Type & Description \\
@@ -38,7 +74,7 @@ to create a table for each geometry type.
     water\_lines           & linestring    & Lakes and rivers                           \\
     water\_polygons        & polygon       & see water\_lines                           \\
     \end{tabular}
-\end{center}
+\end{flushleft}
 
 \subsection{Custom Curated Data}
 
@@ -52,7 +88,6 @@ Certain data is very delicate and has been added by hand.
     marine       & point    & Marine names \\
     countries    & point    & Country names \\
     states       & point    & State names \\
-
     \end{tabular}
 \end{flushleft}
 
@@ -101,6 +136,8 @@ levels.
 \newpage
 \section{Layer Schema}\label{layer-schema}
 
+\subsection{Aeroways, Barriers and Landusages}
+
 For alot of layers linestring and polygon data needs to be converted into
 linestrings for the layers.
 
@@ -111,6 +148,7 @@ linestrings for the layers.
 \end{figure}
 
 \newpage
+\subsection{Administrative Borders}
 Administrative area at lower zoom levels is entirely from Natural Earth.
 
 \begin{figure}[h]
@@ -120,7 +158,8 @@ Administrative area at lower zoom levels is entirely from Natural Earth.
 \end{figure}
 
 \newpage
-Roads are split up into normal roads, tunnels and bridges.
+\subsection{Roads, Bridges and Tunnels}
+Roads are split up into normal roads, tunnels and bridges after a certain zoom level. \texttt{z\_order} and \texttt{layer} attributes are used to order the geometries on the right z axis.
 
 \begin{figure}[h]
   \centering
@@ -129,7 +168,11 @@ Roads are split up into normal roads, tunnels and bridges.
 \end{figure}
 
 \newpage
-Point of interests 
+\subsection{Points of Interest}
+Most POIs are in fact points but buildings tagged with POI attributes
+are often polygons, which is why we need to create tables for both points and polygons.
+The \texttt{localrank} and \texttt{scalerank} of the \texttt{\#poi\_label} layer are calculated from the \texttt{type} and \texttt{area} attributes.
+The \texttt{address} field is pulled together from the various address attributes on the tables (\texttt{street}, \texttt{housenumber}, \texttt{place}, \texttt{city}, \texttt{postcode} and \texttt{country}).
 
 \begin{figure}[h]
   \includegraphics[scale=0.6]{images/poi_layer.png}
@@ -138,8 +181,9 @@ Point of interests
 
 
 \newpage
+\subsection{Water}
 Water bodies for lower zoom levels are taken from Natural Earth
-data while lakes and rivers are from OpenStreetMap.
+data while lakes and rivers are from \osm{}.
 
 \begin{figure}[h]
   \includegraphics[scale=0.6]{images/water_layer.png}
@@ -149,7 +193,8 @@ data while lakes and rivers are from OpenStreetMap.
 
 
 \newpage
-The original OpenStreetMap place data is enriched with scalerank data
+\subsection{Places}
+The original \osm{} place data is enriched with scalerank data
 from natural earth.
 
 \begin{figure}[h]
@@ -159,10 +204,28 @@ from natural earth.
 
 
 
-
 %------------------------------------------------------
+\newpage
 \section{Package Diagrams}
 
+\subsection{Import}
+
+The import is split up into several subimports which all use different data sources.
+
+\begin{figure}[h]
+  \includegraphics[scale=0.6]{images/import_package.png}
+  \caption{Import package}
+\end{figure}
+
+\newpage
+\subsection{Export}
+Export can either be done locally which will process one bounding box or
+split up into several machines using remote features.
+
+\begin{figure}[h]
+  \includegraphics[scale=0.6]{images/export_package.png}
+  \caption{Export package}
+\end{figure}
 
 %------------------------------------------------------
 \section{Workflow}\label{workflow}
@@ -170,7 +233,7 @@ from natural earth.
 \paragraph{First step: Getting OSM
 data}\label{first-step-getting-osm-data}
 
-There are many different sources available to get OSM data from. Most of
+There are many different sources available to get \osm{} data from. Most of
 the time Geofabrik\footnote{\url{http://download.geofabrik.de/}} was
 referenced for getting single countries, continents or even the whole
 planet. But many times people only need a single city or region, because
@@ -178,19 +241,19 @@ of this demand
 Mapzen\footnote{\url{https://mapzen.com/data/metro-extracts/}} provides
 OSM data for many cities and regions around the globe.
 
-The OSM data is missing something very important: the administrative
+The \osm{} data is missing something very important: the administrative
 boundaries. This needs to be downloaded separatly due to the fact, that
 somebody could manipulate the boundary of a region. As a result of this
-administrative boundaries get checked by the OSM community and released
+administrative boundaries get checked by the \osm{} community and released
 separatly.
 
-The data is available in the PBF and OSM XML format. If available the
+The data is available in the PBF and \osm{} XML format. If available the
 PBF(Protocolbuffer Binary
 Format)\footnote{\url{http://wiki.openstreetmap.org/wiki/PBF_Format}}
 version should be choosen, as it is 30\% smaller and 5-6 times faster to
-read and write than the bzipped OSM XML version.
+read and write than the bzipped \osm{} XML version.
 
-\paragraph{Second step: Importing OSM data into
+\paragraph{Second step: Importing \osm{} data into
 Postgis}\label{second-step-importing-osm-data-into-postgis}
 
 
