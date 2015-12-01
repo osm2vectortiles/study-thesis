@@ -1,6 +1,8 @@
 \chapter{Requirements Specification}
 \label{requirements-specification}
 
+This chapter describes the requirements for the vector tiles and the vector tile server.
+
 \section{User Characteristics}
 \label{user-characteristics}
 
@@ -16,19 +18,25 @@ There are two user groups interested in this project:
   published maps.
 \end{itemize}
 
-\section{Actors and Stakeholders}
-\label{actors-and-stakeholders}
-
 \section{User Stories}
 \label{user-stories}
 \paragraph{Serverside Rendering}
-A System Administrator 
+A System Administrator
+
+\paragraph{Clientside Rendering}
+
+
+\paragraph{Own vector tiles}
+
 
 \section{Non Functional Requirements}
 \label{non-functional-requirements}
 
 The most important NFR in this scenario is usability. If we cannot get
 usability right no one will use our solution.
+
+\paragraph{Usability}
+The vector tile server must be usable with Kitematic.
 
 \paragraph{Learnability}
 
@@ -42,8 +50,12 @@ updates regularly.
 
 \paragraph{Performance}
 
-The tileserver must handle 10 concurrent user per second.
+The tileserver must handle 10 concurrent users per second.
 
 \paragraph{Compatibility}
 
-The vector tiles must contain all feature sets Mapbox Streets contain. If we can guarantee full compatibility with Mapbox Streets\footnote{\url{https://www.mapbox.com/developers/vector-tiles/mapbox-streets-v6/}} all Mapbox visual styles can be used with our vector tiles.
+The vector tiles must contain all feature sets Mapbox Streets contains. If we can guarantee full compatibility with Mapbox Streets\footnote{\url{https://www.mapbox.com/developers/vector-tiles/mapbox-streets-v6/}} all Mapbox visual styles can be used with our vector tiles.
+
+\paragraph{Vector Tile Size}
+
+The size of a vector tile should not be greater than 500 KB.

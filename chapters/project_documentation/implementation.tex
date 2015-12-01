@@ -182,11 +182,66 @@ SELECT
 FROM osm_poi
 \end{sqlcode}
 
-\section{Zoomlevel Reference}\label{zoomlevel_reference}
+\section{Data Style}
+
+The data style is a description of all the feature classes such as landuse, water or roads. This description was invented by Mapbox.
+
+The format of a data style looks like this:
+
+\begin{yamlcode}
+_prefs: 
+  disabled: []
+  inspector: false
+  mapid: ''
+  rev: ''
+  saveCenter: true
+attribution: ''
+center: 
+  - 21.7969
+  - 34.6694
+  - 3
+description: Open Streets
+Layer: 
+    # All layer definitions come here
+maxzoom: 14
+minzoom: 0
+name: Open Streets
+\end{yamlcode}
+
+A layer definition looks like this:
+\begin{yamlcode}
+- id: landuse
+Datasource:
+    extent: -20037508.34,-20037508.34,20037508.34,20037508.34
+    host: db
+    port: 5432
+    user: osm
+    password: osm
+    dbname: osm
+    key_field: osm_id
+    table: |-
+        (
+            SELECT osm_id, class, type, geometry
+            FROM osm_landusages
+            WHERE geometry && !bbox!
+            AND z(!scale_denominator!) > 5
+        
+        ) as data
+    type: postgis
+fields:
+    osm_id: Number
+    class: String
+    type: String
+properties:
+    "buffer-size": 4
+\end{yamlcode}
+
+
+\subsection{Zoomlevel Reference}\label{zoomlevel_reference}
 
 % Please add the following required packages to your document preamble:
 % \usepackage{graphicx}
-\begin{table}[]
+\begin{table}[H]
 \centering
 \resizebox{\textwidth}{!}{%
 \begin{tabular}{l|ccccccccccccccc}
