@@ -182,12 +182,11 @@ SELECT
 FROM osm_poi
 \end{sqlcode}
 
-\section{Data Style}
+\section{Data Style}\label{data_style}
 
 The data style is a description of all the feature classes such as landuse, water or roads. This description was invented by Mapbox.
 
 The format of a data style looks like this:
-
 \begin{yamlcode}
 _prefs: 
   disabled: []
@@ -208,7 +207,7 @@ minzoom: 0
 name: Open Streets
 \end{yamlcode}
 
-\section{Layer Definition}\label{layer_definition}
+\subsection{Layer Definition}\label{layer_definition}
 A layer definition describes a view on the data. It can consist of multiple data sources. In the figure below the layer is a view and the definition of this view is a graphic definition.
 
 \begin{figure}[h]
@@ -244,9 +243,10 @@ fields:
 properties:
     "buffer-size": 4
 \end{yamlcode}
+The layer definition consist of the id (layername), datasource, fields and the properties. The datasource in this case defines how the postgis database can be accessed and which sql query needs to be executed. But the datasource could also be a geojson, shapefile, sqlite database, geotiff, kml, gpx or csv file.
 
 
-\subsection{Buffers}\label{buffers}
+\subsubsection{Buffers}\label{buffers}
 The buffer value on a layer defines how many pixels around each tile will be included. It is necessary to ensure correct rendering across tile boundaries. This value is individual for each layer and depends on the type of data. Buffers for layers containing labels should have a large buffers size such as 128 pixels, whereas a layer like landuse does only need a buffers size of 4 pixels. In general, the buffer size should be set to the minimum to keep the size of the vector tiles as low as possible.\footnote{\url{https://www.mapbox.com/help/source-manual/#buffers}}
 
 \begin{figure}[h]
@@ -263,9 +263,13 @@ Overzooming defines to term of displaying data at higher zoom levels.\footnote{\
 This allows us to show data on higher zoom levels, without generating vector tiles for these zoom levels.
 Mapbox has defined a rule of thumb for vector tiles. Vector tiles are useful for about 4-6 levels of overzooming. If I have a vector tile on zoom level 10, it can be stretched out up to zoom level 14 or 16.  
 
+\subsubsection{Layer Ordering}\label{layer_ordering}
+The order in which the layer are defined in the data style is equal to the order they are stored in the vector tiles.
+The layer at the top of the layer definition will be drawn first next the second layer and so one. So the layer at the bottom is drawn on top of all the other layers. 
 
 
-\subsection{Zoomlevel Reference}\label{zoomlevel_reference}
+\section{Zoom Level Reference}\label{zoomlevel_reference}
+The zoom level reference helps to see which feature class is included on which zoom level. The zoom levels are ordered by how they get drawn. The feature class landuse is at the bottom and housenum_label is on top of all the others. 
 
 % Please add the following required packages to your document preamble:
 % \usepackage{graphicx}
@@ -296,6 +300,16 @@ waterway\_label &  &  &  &  &  &  &  &  & x & x & x & x & x & x & x \\
 housenum\_label &  &  &  &  &  &  &  &  &  &  &  &  &  &  & x
 \end{tabular}
 }
-\caption{Shows which feature set is included on which zoom level}
+\caption{Shows which feature class is included on which zoom level}
 \label{my-label}
 \end{table}
+
+\section{Reverse Engineering Process}\label{reverse_engineering_process}
+
+\subsection{Vector Tile Format}\label{vector_tile_format}
+
+\subsection{Tools}\label{tools}
+
+\subsubsection{Vector Tile Compare}\label{vector_tile_compare}
+
+\subsubsection{Visual Compare}\label{visual_compare}
