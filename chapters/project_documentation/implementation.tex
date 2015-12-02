@@ -208,6 +208,15 @@ minzoom: 0
 name: Open Streets
 \end{yamlcode}
 
+\section{Layer Definition}\label{layer_definition}
+A layer definition describes a view on the data. It can consist of multiple data sources. In the figure below the layer is a view and the definition of this view is a graphic definition.
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=1\textwidth]{images/graphic_definition.png}
+  \caption{General graphic definition}
+\end{figure}
+
 A layer definition looks like this:
 \begin{yamlcode}
 - id: landuse
@@ -235,6 +244,25 @@ fields:
 properties:
     "buffer-size": 4
 \end{yamlcode}
+
+
+\subsection{Buffers}\label{buffers}
+The buffer value on a layer defines how many pixels around each tile will be included. It is necessary to ensure correct rendering across tile boundaries. This value is individual for each layer and depends on the type of data. Buffers for layers containing labels should have a large buffers size such as 128 pixels, whereas a layer like landuse does only need a buffers size of 4 pixels. In general, the buffer size should be set to the minimum to keep the size of the vector tiles as low as possible.\footnote{\url{https://www.mapbox.com/help/source-manual/#buffers}}
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=1\textwidth]{images/buffer.png}
+  \caption{Example for buffer values}
+\end{figure}
+
+The figure above is a good example to see the result of a buffer value. We can see that there are rivers but no other data, therefore the rivers must have a larger buffer value that the other layers.
+
+\subsubsection{Overzooming}\label{overzooming}
+The min- and maxzoom values define on which zoom levels there is data. This does not mean that it is not possible to zoom deeper in that the maxzoom value.
+Overzooming defines to term of displaying data at higher zoom levels.\footnote{\url{https://www.mapbox.com/help/source-manual/#overzooming}}
+This allows us to show data on higher zoom levels, without generating vector tiles for these zoom levels.
+Mapbox has defined a rule of thumb for vector tiles. Vector tiles are useful for about 4-6 levels of overzooming. If I have a vector tile on zoom level 10, it can be stretched out up to zoom level 14 or 16.  
+
 
 
 \subsection{Zoomlevel Reference}\label{zoomlevel_reference}
