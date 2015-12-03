@@ -2,14 +2,14 @@
 
 \section{Spatial Database}\label{spatial_database}
 
-PostGIS was the only viable choice due to superbe tooling support. The OSM wiki\footnote{\url{http://wiki.openstreetmap.org/wiki/Databases_and_data_access_APIs#Database_Schemas}} provides a very helpful article about which import tool or database should be selected for different use cases. For the use case rendering the only possibility they recommend is PostgresSQL with the PostGIS extension. 
+PostGIS was the only viable choice due to superbe tooling support. The OSM wiki\footnote{\url{http://wiki.openstreetmap.org/wiki/Databases_and_data_access_APIs\#Database_Schemas}} provides a very helpful article about which import tool or database should be selected for different use cases. For the use case rendering the only possibility they recommend is PostgresSQL with the PostGIS extension. 
 
-\section{OSM Import Tool}\label{osm-import-tool}
+\section{OSM Import Tool}\label{osm_import_tool}
 The OSM community
 recommends\footnote{\url{http://wiki.openstreetmap.org/wiki/Databases_and_data_access_APIs}}
 PostgreSQL with the Postgis extension and imposm or osm2pgsql as import tool.
 
-\subsection{Criterias}
+\subsection{Criterias}\label{criterias}
 
 \paragraph{Speed} 
 In order to iterate fast and be able to change the data style frequently
@@ -31,7 +31,7 @@ planet dump.
 In order to get started it is helpful to have alot of query example
 from other data style projects available.
 
-\subsection{Evaluation Matrix}
+\subsection{Evaluation Matrix}\label{evaluation_matrix}
 
 \begin{center}
     \begin{tabular}{llll}
@@ -48,7 +48,7 @@ from other data style projects available.
 \end{center}
 
 
-\subsection{osm2pgsql}\label{osm2pgsql-importer}
+\subsection{osm2pgsql}\label{osm2pgsql_importer}
 
 osm2pgsql \footnote{\url{http://wiki.openstreetmap.org/wiki/Osm2pgsql}} is the
 most commonly used import tool for processing raw OpenStreetMap data into PostGIS.
@@ -67,7 +67,7 @@ the import tool supports updating based on OSM diff files. Imposm 3 is
 faster than osm2pgsql and supports updatability. So we decided to take
 imposm for importing.
 
-\subsection{Imposm 3 }\label{imposm-importer}
+\subsubsection{Imposm 3 }\label{imposm-importer}
 
 Imposm is an import tool for osm data, it is not a schema. But it
 defines a default
@@ -110,11 +110,13 @@ proprietary.
 
 TODO: formulate decision
 
-\section{Vector Tile Server}
+\section{Vector Tile Server}\label{vector_tile_server}
+
 Next to the vector tiles for Switzerland, the second deliverable is a basic vector tile server. So that even a non technical person can get started quickly with our vector tiles.\newline{}
 When we did some research on open source projects of vector tile servers, we found out that most of the people build their tile server set-up specifically for their use case. So there wasn't a typical solution present like Postgres is for the spatial databases.
 
-\subsection{Tessera}
+\subsection{Tessera}\label{tessera}
+
 Tessera is basically a Node.js webserver, which uses Mapbox's tilelive\footnote{\url{https://github.com/mapbox/tilelive}} modules to read vector tiles and generate raster tiles of it.
 TODO: Add diagramm with architecture
 We did load tests to get some metrics on how the server is performing.
@@ -124,7 +126,6 @@ Task: Zooming in from zoom level 10 to 22
 Conditions: 50 concurrent users
 Results:
 \begin{bashcode}
-================================================================================
 ---- Global Information --------------------------------------------------------
 > request count                                      10350 (OK=10348  KO=2     )
 > min response time                                     50 (OK=50     KO=60010 )
@@ -142,16 +143,15 @@ Results:
 ---- Errors --------------------------------------------------------------------
 > java.util.concurrent.TimeoutException: Request timed out to ec      2 (100.0%)
 2-52-30-184-45.eu-west-1.compute.amazonaws.com/52.30.184.45:80...
-================================================================================
 \end{bashcode}
 
 With 50 concurrent users tessera was still able to respond to all requests in less than 1200 ms.
 
-\subsection{OpenStreetMap "Standard" tile server}
-Our adviser Petr Pridal recommended to reimplement the OSM standard raster tile server for the use of vector tiles. The OSM standard raster tile server consists of Apache as webserver and a custom Apache module called mod_tile\footnote{\url{http://wiki.openstreetmap.org/wiki/Mod_tile}} for the rendering of raster tiles. This is a proven set-up as it is in production since years, but it was designed a long time ago when nobody though about vector tiles.
+\subsection{OpenStreetMap "Standard" tile server}\label{osm_standard_tile_server}
+Our adviser Petr Pridal recommended to reimplement the OSM standard raster tile server for the use of vector tiles. The OSM standard raster tile server consists of Apache as webserver and a custom Apache module called mod\_tile\footnote{\url{http://wiki.openstreetmap.org/wiki/Mod_tile}} for the rendering of raster tiles. This is a proven set-up as it is in production since years, but it was designed a long time ago when nobody though about vector tiles.
 
 Petr Pridals proposal was instead of having a geospatial database as datasource like the "old" raster tile server, switching the datasource to vector tiles. The task would have been to implement a custom Apache module which reads the vector tiles, renders them with mapnik and provides them to the apache webserver.
 
-\subsection{Decision}
+\subsection{Decision}\label{tile_server_decision}
 The plan was to perform the load test on each version of the vector tile server and then make the decision based on the results. Due to the fact, that the test results of tessera where good enough for our use case and we didn't have to implement a lot, we decided to take tessera as vector tile server.
 If somebody needs a high-performance tile server, one should probably think about the second variant.

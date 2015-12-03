@@ -247,7 +247,7 @@ The layer definition consist of the id (layername), datasource, fields and the p
 
 
 \subsubsection{Buffers}\label{buffers}
-The buffer value on a layer defines how many pixels around each tile will be included. It is necessary to ensure correct rendering across tile boundaries. This value is individual for each layer and depends on the type of data. Buffers for layers containing labels should have a large buffers size such as 128 pixels, whereas a layer like landuse does only need a buffers size of 4 pixels. In general, the buffer size should be set to the minimum to keep the size of the vector tiles as low as possible.\footnote{\url{https://www.mapbox.com/help/source-manual/#buffers}}
+The buffer value on a layer defines how many pixels around each tile will be included. It is necessary to ensure correct rendering across tile boundaries. This value is individual for each layer and depends on the type of data. Buffers for layers containing labels should have a large buffers size such as 128 pixels, whereas a layer like landuse does only need a buffers size of 4 pixels. In general, the buffer size should be set to the minimum to keep the size of the vector tiles as low as possible.\footnote{\url{https://www.mapbox.com/help/source-manual/\#buffers}}
 
 \begin{figure}[h]
   \centering
@@ -259,7 +259,7 @@ The figure above is a good example to see the result of a buffer value. We can s
 
 \subsubsection{Overzooming}\label{overzooming}
 The min- and maxzoom values define on which zoom levels there is data. This does not mean that it is not possible to zoom deeper in that the maxzoom value.
-Overzooming defines to term of displaying data at higher zoom levels.\footnote{\url{https://www.mapbox.com/help/source-manual/#overzooming}}
+Overzooming defines to term of displaying data at higher zoom levels.\footnote{\url{https://www.mapbox.com/help/source-manual/\#overzooming}}
 This allows us to show data on higher zoom levels, without generating vector tiles for these zoom levels.
 Mapbox has defined a rule of thumb for vector tiles. Vector tiles are useful for about 4-6 levels of overzooming. If I have a vector tile on zoom level 10, it can be stretched out up to zoom level 14 or 16.  
 
@@ -269,7 +269,7 @@ The layer at the top of the layer definition will be drawn first next the second
 
 
 \section{Zoom Level Reference}\label{zoomlevel_reference}
-The zoom level reference helps to see which feature class is included on which zoom level. The zoom levels are ordered by how they get drawn. The feature class landuse is at the bottom and housenum_label is on top of all the others. 
+The zoom level reference helps to see which feature class is included on which zoom level. The zoom levels are ordered by how they get drawn. The feature class landuse is at the bottom and housenum\_label is on top of all the others. 
 
 % Please add the following required packages to your document preamble:
 % \usepackage{graphicx}
@@ -317,7 +317,7 @@ To better understand what the vector tile compare tool does, we will give a high
 
 A vector tile can consist of one or more named layers and containing one or more features. A feature consist of attributes and a geometry (point, linestring or polygon). Attributes are represented as a dictionary of key, value pairs. 
 
-Below you can find an example vector tile, which has two layers water and admin. The water layer has the attribute key "osm_id" and value "0". If you would compare this example with the specification\footnote{\url{https://github.com/mapbox/vector-tile-spec/tree/master/1.0.1}}, one could think this is not a specification conform vector tile. The example below is a compressed vector tile. More information on what compression methods are applied can be found in the specification. 
+Below you can find an example vector tile, which has two layers water and admin. The water layer has the attribute key "osm\_id" and value 0. If you would compare this example with the specification\footnote{\url{https://github.com/mapbox/vector-tile-spec/tree/master/1.0.1}}, one could think this is not a specification conform vector tile. The example below is a compressed vector tile. More information on what compression methods are applied can be found in the specification. 
 
 Mapbox Streets v6 vector tile(0/0/0):
 \begin{jsoncode}
