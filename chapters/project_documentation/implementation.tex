@@ -305,11 +305,79 @@ housenum\_label &  &  &  &  &  &  &  &  &  &  &  &  &  &  & x
 \end{table}
 
 \section{Reverse Engineering Process}\label{reverse_engineering_process}
+One of the main requirements of this project was to make our vector tiles compatible with the Mapbox Streets vector tiles\footnote{\url{https://www.mapbox.com/developers/vector-tiles/mapbox-streets-v6/}}.
+
+We didn't define this requirement from the beginning, it just evolved during the construction of our first prototype.
+Therefore we spent a lot of time making our vector tiles as similar as possible to the ones of Mapbox.
+
+The sections below describe the tools and methods we used to achieve the goal of Mapbox Streets compatibility.
 
 \subsection{Vector Tile Format}\label{vector_tile_format}
+To better understand what the vector tile compare tool does, we will give a high level introduction to the vector tiles format.
+
+A vector tile can consist of one or more named layers and containing one or more features. A feature consist of attributes and a geometry (point, linestring or polygon). Attributes are represented as a dictionary of key, value pairs. 
+
+Below you can find an example vector tile, which has two layers water and admin. The water layer has the attribute key "osm_id" and value "0". If you would compare this example with the specification\footnote{\url{https://github.com/mapbox/vector-tile-spec/tree/master/1.0.1}}, one could think this is not a specification conform vector tile. The example below is a compressed vector tile. More information on what compression methods are applied can be found in the specification. 
+
+Mapbox Streets v6 vector tile(0/0/0):
+\begin{jsoncode}
+{ 
+  "layers": {
+    "water": {
+      "version": 1,
+      "name": "water",
+      "extent": 4096,
+      "length": 18,
+      "_pbf": {
+        "buf": [26,143,32,10,5,119,97,1],
+        "pos": 51410,
+        "length": 51410
+      },
+      "_keys": ["osm_id"],
+      "_values": [0],
+      "_features": [11,3474,3499,3530,3561,3584] 
+    },
+    "admin": {
+      "version": 1,
+      "name": "admin",
+      "extent": 4096,
+      "length": 1447,
+      "_pbf": {
+        "buf": [26,143,32,10,5,1],
+        "pos":51410,
+        "length":51410
+       },
+      "_keys": ["admin_level","disputed","iso_3166_1","maritime"],
+      "_values": [2,0,"FR",1],
+      "_features": [4126,4152,4377,4403,4429,4455,4481,4507,4533]
+    }
+  } 
+}
+\end{jsoncode}
 
 \subsection{Tools}\label{tools}
+During the prototyping phase we realized, that we needed build tools which help us track the progress of compatibility.
 
 \subsubsection{Vector Tile Compare}\label{vector_tile_compare}
+The vector tile compare tool analyzes vector tiles and outputs interesting information like layers and attributes. We generated this output for the same vector tiles of Mapbox Streets and our own (Open Streets). Next we uploaded the results to a Github repository and used the branch compare feature to compare them. 
 
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=1\textwidth]{images/vector_tile_compare.png}
+  \caption{Compare of Mapbox Streets v6 and Open Streets on 31.10.2015}
+\end{figure}
+
+This gave us a good indicator, which layers are shown on which zoom level and what attributes are contained in a layer.
 \subsubsection{Visual Compare}\label{visual_compare}
+The vector tile comparison was good to ensure that we have exactly the same data on the same zoom level. But when we started to visually compare our map with the map of Mapbox Streets, we still saw big differences. So we decided to build a visual compare tool. 
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=1\textwidth]{images/visual_compare.png}
+  \caption{Visual Compare of Mapbox Streets and Open Streets}
+\end{figure}
+
+The figure below shows a screenshot of the visual compare tool. On the left side is Mapbox Streets and on the right side our Open Streets map. They both use the same visual style (OSM Bright 2\footnote{\url{https://github.com/mapbox/mapbox-studio-osm-bright.tm2}}). When you zoom in on the right side of the map, it automatically zooms in on the right side. This tools was very helpful to find all the differences.
+
+\subsection{Working Methods}
+This section describes what we did, when we found a difference. When we identified a difference with the vector compare or visual compare tool, we first checked if the missing data is included in our import mapping. If this was not the case, we used the TagFinder tool\footnote{\url{https://wiki.openstreetmap.org/wiki/TagFinder}} find the right OSM key, value pair of the missing item. Next we included the key, value pair into our import mapping and re-imported the OSM data. At the end the SQL query needs to be altered to fetch the added item. Now the missing item should appear on the map. During this process we used mostly Mapbox Studio Classic\footnote{\url{https://www.mapbox.com/mapbox-studio-classic/}} as the map can be rendered on the fly after the query has been altered.
