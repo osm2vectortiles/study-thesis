@@ -1,8 +1,8 @@
-\chapter{Technology Evaluation}
+\chapter{Technology Evaluation}\label{technology_evaluation}
 
-\section{Spatial Database}
+\section{Spatial Database}\label{spatial_database}
 
-PostGIS was the only viable choice due to superbe tooling support.
+PostGIS was the only viable choice due to superbe tooling support. The OSM wiki\footnote{\url{http://wiki.openstreetmap.org/wiki/Databases_and_data_access_APIs#Database_Schemas}} provides a very helpful article about which import tool or database should be selected for different use cases. For the use case rendering the only possibility they recommend is PostgresSQL with the PostGIS extension. 
 
 \section{OSM Import Tool}\label{osm-import-tool}
 The OSM community
@@ -111,7 +111,47 @@ proprietary.
 TODO: formulate decision
 
 \section{Vector Tile Server}
+Next to the vector tiles for Switzerland, the second deliverable is a basic vector tile server. So that even a non technical person can get started quickly with our vector tiles.\newline{}
+When we did some research on open source projects of vector tile servers, we found out that most of the people build their tile server set-up specifically for their use case. So there wasn't a typical solution present like Postgres is for the spatial databases.
 
 \subsection{Tessera}
+Tessera is basically a Node.js webserver, which uses Mapbox's tilelive\footnote{\url{https://github.com/mapbox/tilelive}} modules to read vector tiles and generate raster tiles of it.
+TODO: Add diagramm with architecture
+We did load tests to get some metrics on how the server is performing.
 
-\subsection{Apache}
+Infrastructure: AWS EC2 t2.micro instance(1 GB Memory / 1 Core)
+Task: Zooming in from zoom level 10 to 22
+Conditions: 50 concurrent users
+Results:
+\begin{bashcode}
+================================================================================
+---- Global Information --------------------------------------------------------
+> request count                                      10350 (OK=10348  KO=2     )
+> min response time                                     50 (OK=50     KO=60010 )
+> max response time                                  60335 (OK=56103  KO=60335 )
+> mean response time                                  2138 (OK=2127   KO=60172 )
+> std deviation                                       3023 (OK=2914   KO=162   )
+> response time 50th percentile                       1115 (OK=1114   KO=60172 )
+> response time 75th percentile                       3127 (OK=3125   KO=60253 )
+> mean requests/sec                                 75.919 (OK=75.904 KO=0.015 )
+---- Response Time Distribution ------------------------------------------------
+> t < 800 ms                                          4545 ( 44%)
+> 800 ms < t < 1200 ms                                 756 (  7%)
+> t > 1200 ms                                         5047 ( 49%)
+> failed                                                 2 (  0%)
+---- Errors --------------------------------------------------------------------
+> java.util.concurrent.TimeoutException: Request timed out to ec      2 (100.0%)
+2-52-30-184-45.eu-west-1.compute.amazonaws.com/52.30.184.45:80...
+================================================================================
+\end{bashcode}
+
+With 50 concurrent users tessera was still able to respond to all requests in less than 1200 ms.
+
+\subsection{OpenStreetMap "Standard" tile server}
+Our adviser Petr Pridal recommended to reimplement the OSM standard raster tile server for the use of vector tiles. The OSM standard raster tile server consists of Apache as webserver and a custom Apache module called mod_tile\footnote{\url{http://wiki.openstreetmap.org/wiki/Mod_tile}} for the rendering of raster tiles. This is a proven set-up as it is in production since years, but it was designed a long time ago when nobody though about vector tiles.
+
+Petr Pridals proposal was instead of having a geospatial database as datasource like the "old" raster tile server, switching the datasource to vector tiles. The task would have been to implement a custom Apache module which reads the vector tiles, renders them with mapnik and provides them to the apache webserver.
+
+\subsection{Decision}
+The plan was to perform the load test on each version of the vector tile server and then make the decision based on the results. Due to the fact, that the test results of tessera where good enough for our use case and we didn't have to implement a lot, we decided to take tessera as vector tile server.
+If somebody needs a high-performance tile server, one should probably think about the second variant.
