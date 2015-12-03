@@ -1,12 +1,10 @@
-\chapter{Requirements Specification}
-\label{requirements-specification}
+\chapter{Requirements Specification}\label{requirements_specification}
 
 This chapter describes the requirements for the vector tiles and the vector tile server.
 
-\section{User Characteristics}
-\label{user-characteristics}
+\section{User Characteristics}\label{user_characteristics}
 
-There are two user groups interested in this project:
+There are three user groups interested in this project:
 
 \begin{itemize}
 \item
@@ -14,29 +12,28 @@ There are two user groups interested in this project:
   OSX which has knowledge of GIS software but not necessarily of it's
   inner technical workings.
 \item
-  \textbf{System Administrator}: The person who needs to host the
+  \textbf{System Administrator}: The person which needs to host the
   published maps.
+\item
+  \textbf{Geographic Institutes or other companies}: Institutions which would like to provide their own geospatial data in vector tile format. 
 \end{itemize}
 
-\section{User Stories}
-\label{user-stories}
+\section{User Stories}\label{user_stories}
 \paragraph{Serverside Rendering}
-A System Administrator
+The map designer brings his new map design to the system administrator and tells him to host the map. The system administrator can download the vector tiles of the osm2vectortiles website and serve the map with the help of a vector tile server.
 
 \paragraph{Clientside Rendering}
-
+The map designer brings his new map design to the system administrator and tells him to host the map. The system administrator does not want to provide a big server that can handle the heavy rendering work. So he decides to use Mapbox GL\footnote{\url{https://www.mapbox.com/mapbox-gl-js/api/}} which offloads the rendering work to the client. In order to use Mapbox GL he needs to statically serve the vector tiles. 
 
 \paragraph{Own vector tiles}
+Institutions which provide geospatial data would like to follow the trend of vector tiles and provide their data in vector tile format. These institutions can use this project for this matter. They can easily modify this project to use it with their data. 
 
+\section{Non Functional Requirements}\label{non_functional_requirements}
 
-\section{Non Functional Requirements}
-\label{non-functional-requirements}
-
-The most important NFR in this scenario is usability. If we cannot get
-usability right no one will use our solution.
+The non functional requirements are the key to success of this project. If we can fulfill the following requirements, the specified users will be able to benefit form our project.
 
 \paragraph{Usability}
-The vector tile server must be usable with Kitematic.
+The vector tile server must be usable with Kitematic\footnote{\url{https://kitematic.com/}}. Kitematic is an easy to use user interface for docker. 
 
 \paragraph{Learnability}
 
@@ -58,4 +55,4 @@ The vector tiles must contain all feature sets Mapbox Streets contains. If we ca
 
 \paragraph{Vector Tile Size}
 
-The size of a vector tile should not be greater than 500 KB.
+The size of a single vector tile should not be greater than 500 KB.
