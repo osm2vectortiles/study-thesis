@@ -4,43 +4,63 @@ The most promising vector tile specification was proposed by Mapbox.
 \marginpar{The Mapbox Vector Tile Specification is compared with other vector tile formats in chapter \ref{vector-tile-formats}}
 They provide many open source tools to manage vector tiles. We tried not to implement tools which already exists and instead use as many existing tools as possible. Because of this our implementation consists mostly of docker containers which do a specific task.
 
-\section{Data Sources}
-\label{data-sources}
+\section{Workflow}\label{workflow}
+This section describes the workflow of generating vector tiles. The following sections will provide implementation details on each of the steps described here. 
 
-Making a map involves finding the right data slice in the right
-data sources.
+\paragraph{First step: Getting OSM data}
 
-\subsection{OpenStreetMap}
+There are many different sources available to get OSM data from. Most of
+the time Geofabrik\footnote{\url{http://download.geofabrik.de/}} was
+referenced for getting single countries, continents or even the whole
+planet. But many times people only need a single city or region, because
+of this demand
+Mapzen\footnote{\url{https://mapzen.com/data/metro-extracts/}} provides
+OSM data for many cities and regions around the globe.
 
-The biggest part of our data originates from published OpenStreetMap snapshots. The OpenStreetMap data is used to provide the detailed parts of the map and is the cornerstone of the entire map.
+The OSM data is missing something very important: the administrative
+boundaries. This needs to be downloaded separatly due to the fact, that
+somebody could manipulate the boundary of a region. As a result of this
+administrative boundaries get checked by the OSM community and released
+separatly.
 
-We import selected key value pairs and their geometries of the entire OpenStreetMap database from Planet OSM \footnote{\url{http://planet.osm.org/}}.
+The data is available in the PBF and OSM XML format. If available the
+PBF(Protocolbuffer Binary
+Format)\footnote{\url{http://wiki.openstreetmap.org/wiki/PBF_Format}}
+version should be choosen, as it is 30\% smaller and 5-6 times faster to
+read and write than the bzipped OSM XML version.
 
+\paragraph{Second step: Importing OSM data into PostGIS}
+We use imposm3 to import the OSM data into our PostGIS database. Since we don't need all the key, value pairs, we defined an import mapping which defines all the values we need in the database.
 
-\subsection{Curated OpenStreetMap Data}
+\paragraph{Third step: Mapbox studio source project}
 
-Certain OpenStreetMap data like borders and land polygons are very sensitive for change.
-The OpenStreetMapData\footnote{\url{http://openstreetmapdata.com/}}
-project takes care of alot of issues that happen with coastlines
-and provide it in a convenient format.
+A Mapbox studio source project is divided into the following folder
+structure\footnote{\url{https://www.mapbox.com/guides/source-manual/\#source-project}}:
 
-We use the following data from OpenStreetMapData:
+\begin{verbatim}
+source-project.tm2source/
+    data.yml
+    data.xml
+    .thumb.png
+\end{verbatim}
 
-\begin{itemize}
-\item Water polygons
-\end{itemize}
+The data file defines all feature sets(layers) like landuse, waterway,
+road etc. The definition contains metadata like id, datasource(db, host,
+query, srid, extent), description, fields and properties. Mapbox Studio
+needs the yml version and mapnik the xml version of this file.
+.thumb.png is a thumbnail image that gets displayed in the projects
+list.
 
-\section{Natural Earth}
+\paragraph{Fourth step: Generating vector tiles}
 
-The Natural Earth \footnote{\url{http://www.naturalearthdata.com/}} dataset provides manually curated data of cultural and physical features of the world. Natural earth data is especially useful at higher levels when it matters alot what to display when.
+To generate the vector tiles we use mapnik. Mapbox provides a very handy
+tool to generate vector tiles.
 
-We use the following data from Natural Earth:
+tilelive-copy provides the Mapnik XML file and the extent to mapnik
+which then generates the vector tiles. Tilelive-copy outputs these
+vector tiles in the mbtiles container.
+\newpage
 
-\begin{itemize}
-\item Rankings of big cities
-\item Major lakes
-\item Country and administrative borders
-\end{itemize}
 
 \section{Classification}
 \label{classification}
@@ -381,3 +401,81 @@ The figure below shows a screenshot of the visual compare tool. On the left side
 
 \subsection{Working Methods}
 This section describes what we did, when we found a difference. When we identified a difference with the vector compare or visual compare tool, we first checked if the missing data is included in our import mapping. If this was not the case, we used the TagFinder tool\footnote{\url{https://wiki.openstreetmap.org/wiki/TagFinder}} find the right OSM key, value pair of the missing item. Next we included the key, value pair into our import mapping and re-imported the OSM data. At the end the SQL query needs to be altered to fetch the added item. Now the missing item should appear on the map. During this process we used mostly Mapbox Studio Classic\footnote{\url{https://www.mapbox.com/mapbox-studio-classic/}} as the map can be rendered on the fly after the query has been altered.
+
+\section{Data Sources}
+\label{data-sources}
+
+Making a global map involves finding the right data slice in the right data sources.
+
+\subsection{Map Features from OpenStreetMap}
+
+The cornerstone of the entire map is \osm data from published snapshots from OSM Planet\footnote{\url{http://planet.osm.org/}}. The \osm{} data is used for high zoom levels where detailled coverage of local areas is very important.
+
+We import selected tags \footnote{\url{http://wiki.openstreetmap.org/wiki/Tags}} and their geometries. The decision which tags and geometries are imported is in the chapter mapping
+
+TODO: Create label for mapping
+
+\subsection{Curated water polygons from OpenStreetMapData}
+
+Certain OpenStreetMap data like borders and land polygons are very sensitive for change.
+The OpenStreetMapData\footnote{\url{http://openstreetmapdata.com/}}
+project takes care of alot of issues that happen with coastlines
+and provide it in a convenient format.
+
+We use water polygons \footnote{\url{http://openstreetmapdata.com/data/water-polygons}} from OpenStreetMapData. This data set ensures that the water polygons
+work well together with other \osm{} data and splits big water polygons into multiple 
+pieces for performance.
+
+\section{Borders and ranks from Natural Earth}
+
+The Natural Earth \footnote{\url{http://www.naturalearthdata.com/}} dataset provides manually curated data of cultural and physical features of the world. Natural earth data is especially useful at higher levels when it matters alot what should not be displayed.
+
+We use the following data from Natural Earth:
+
+\begin{itemize}
+\item Label ranks of big cities\footnote{\url{http://www.naturalearthdata.com/downloads/10m-cultural-vectors/10m-populated-places/}}
+\item Major lakes\footnote{\url{http://www.naturalearthdata.com/downloads/10m-physical-vectors/10m-lakes/}}
+\item Country\footnote{\url{http://www.naturalearthdata.com/downloads/10m-cultural-vectors/10m-admin-0-countries/}} and administrative\footnote{\url{http://www.naturalearthdata.com/downloads/10m-cultural-vectors/10m-admin-1-states-provinces/}} borders including disputed borders\footnote{\url{http://www.naturalearthdata.com/downloads/10m-cultural-vectors/10m-admin-0-breakaway-disputed-areas/}}
+\end{itemize}
+
+
+\section{PostgreSQL Performance}
+\label{postgres-performance}
+
+The most intensive work is done on the database side to respond to all SQL queries
+made by Mapnik in the fastest way possible.
+
+\subsection{Tuning}
+
+The PostgreSQL default parameters do not deliver good performance for stronger machines\footnote{\url{https://wiki.postgresql.org/wiki/Tuning_Your_PostgreSQL_Server}-}
+For the different database machines we used the PgTune\footnote{\url{http://pgtune.leopard.in.ua/}} calculator to determine good cache and buffer sizes for data warehouse style computing.
+
+Example configuration for a host with 50 GB of memory.
+
+\begin{bashcode}
+max_connections = 20
+shared_buffers = 12800MB
+effective_cache_size = 38400MB
+work_mem = 320MB
+maintenance_work_mem = 2GB
+checkpoint_segments = 128
+checkpoint_completion_target = 0.9
+wal_buffers = 16MB
+default_statistics_target = 500
+\end{bashcode}
+
+For speed up importing we disabled transactional features of PostgreSQL. \footnote{\url{http://www.databasesoup.com/2015/02/running-with-scissors-mode.html}}.
+
+\begin{bashcode}
+bgwriter_lru_maxpages = 0
+wal_level = minimal
+fsync = off
+synchronous_commit = off
+full_page_writes = off
+wal_log_hints = off
+\end{bashcode}
+
+
+\subsection{Indizes}
+
+We use clustered indizes on the geometries to provide fast tile lookup.
