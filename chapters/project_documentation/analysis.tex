@@ -1,72 +1,197 @@
 \chapter{Design}\label{design}
 
+%------------------------------------------------------
+\section{Architecture}
+
+The project is divided into the \texttt{import} phase where
+the ETL process  happens and an \texttt{export} phase where the PostGIS data
+is transformed into vector tiles using the \texttt{open-streets} data style.
+The data style depends on the database schema defined by the \texttt{import}. 
+
+
+Along the way many additional development \texttt{tooling} was needed for the reverse engineering process and for improving developer productivity. Everything that is not needed during
+the workflow but only for development or verification is in this package.
+
+
+The infrastructure package contains specially configured programs as Docker images.
+It contains a PostGIS database, a connection pooler (pgbouncer) and a tessera based raster tile server.
+
+\begin{figure}[h]
+  \includegraphics[scale=0.6]{images/high_level_packages.png}
+  \caption{High level package diagram}
+\end{figure}
 
 %------------------------------------------------------
-\section{Architecture}\label{architecture}
+\newpage
+\subsection{Import}
+
+The import consists of several imports of different data sources.
+
+\paragraph{import-osm-data}
+Import of the OSM planet file with a custom mapping configuration.
+
+\paragraph{import-sql}
+Custom SQL functions to keep SQL queries in the \texttt{open-streets} data style DRY and generated SQL code for classifications. 
+
+\paragraph{update-scaleranks}
+Custom scalerank updates from Natural Earth data for better scaleranks in places.
+
+\paragraph{import-natural-earth}
+Import of Natural Earth data.
+
+\paragraph{import-water}
+Water polygons from OpenStreetMapData.
+
+\paragraph{import-labels}
+Custom curated labels for marine, countries and states.
+
+\begin{figure}[h]
+  \includegraphics[scale=0.6]{images/import_all_package_diagram.png}
+  \caption{Import package}
+\end{figure}
 
 
+%------------------------------------------------------
+\newpage
+\subsection{Export}
+Export can either be done locally which will process one bounding box or in parallel on several
+remote machines. In this thesis we will only focus on local export.
+
+
+\paragraph{open-streets}
+The data style project is the most essential component which pulls together all the
+data of different datasources to create vector tile. 
+
+\paragraph{export-local}
+A process which is using the open-streets.tm2source project to create vector tiles for a
+given bounding box.
+
+\paragraph{export-remote}
+A worker implementation which uses a queue to read jobs and work through jobs with
+\texttt{export-local}.
+
+\begin{figure}[h]
+  \includegraphics[scale=0.6]{images/export_package.png}
+  \caption{Export package}
+\end{figure}
+\newpage
+
+%------------------------------------------------------
+\newpage
+\subsection{Tooling}
+
+Tooling contains the various tools we work with.
+
+\paragraph{enqueue-jobs}
+Create jobs for certain areas automatically.
+
+\paragraph{merge}
+Merge results of jobs together into a final big file.
+
+\paragraph{verify}
+Verify size and correctness of MBTiles files.
+
+\paragraph{compare}
+Compare different vector tiles for their differences.
+
+\paragraph{visual-compare}
+Compare different raster tiles in an interactive map.
+
+\paragraph{generate-diagrams}
+Generate mapping and layer diagrams from source code.
+
+\paragraph{test-performance}
+Load testing with Gatling for tileserver implementation.
+
+\paragraph{mapbox-studio}
+Mapbox studio in a Docker container for working on a server.
+
+\paragraph{optimize-mbtiles}
+Remove redundant subpyramids of MBTiles to save disk space.
+
+\begin{figure}[h]
+  \includegraphics[scale=0.6]{images/tooling_package_diagram.png}
+  \caption{Tooling package}
+\end{figure}
+
+%------------------------------------------------------
+\newpage
+\section{Deployment}\label{deployment}
+
+All workflow processes are deployed as Docker containers. The software package
+is usually one single process.
+
+\subsection{Import}
+
+The data container pattern\footnote{\url{http://container42.com/2013/12/16/persistent-volumes-with-docker-container-as-volume-pattern/}} is used in \texttt{cache} and \texttt{pgdata}. Those
+data only containers are mounted from \texttt{import-osm-data} for storing cache data while importing and in the \texttt{postgis} for storing the database files.
+For convenience the \texttt{import-external-data} imports several data sources at once.
+
+\begin{figure}[h]
+  \includegraphics[scale=0.6]{images/deployment_import.png}
+  \caption{Import deployment diagram}
+\end{figure}
+
+%------------------------------------------------------
+\newpage
+\subsection{Export and Development Tools}
+
+For performance reason a connection pooler is in front of the actual \texttt{postgis} container.
+
+The raster tileserve can serve directly from the export directory where the generated MBTiles
+are put. The \texttt{mapbox-studio} container allows editing the \texttt{open-streets} project and connects directly to the \texttt{postgis} container.
+
+\begin{figure}[h]
+  \includegraphics[scale=0.6]{images/deployment_dev_export.png}
+  \caption{Export and development tools deployment diagram}
+\end{figure}
+
+%------------------------------------------------------
+\newpage
 \section{Workflow}\label{workflow}
 
 \subsection{Import}\label{workflow-import}
 
 \begin{figure}[h]
-  \includegraphics[scale=0.6]{images/import_flow.png}
+  \includegraphics[scale=0.6]{images/import_package_flow.png}
   \caption{Import workflow from various data sources into PostGIS}
 \end{figure}
 
+\newpage
 \subsection{Export}\label{workflow-export}
 
+For generating the vector tiles the tilelive tool \texttt{tl} \footnote{\url{https://github.com/mojodna/tl}} is used which wraps
+around Mapnik. 
+\marginpar{\nameref{data_style} is a Mapbox Studio source project.}
+The data style defines all feature sets (layers) and is transformed into a Mapnik
+XML stylesheet.
+
+The \texttt{tl} utility stores the generated vector tiles in a MBTiles container.
+
 \begin{figure}[h]
-  \includegraphics[scale=0.6]{images/export_flow.png}
+  \includegraphics[scale=0.6]{images/export_package_flow.png}
   \caption{Export data from PostGIS to MBTiles}
 \end{figure}
 
 %------------------------------------------------------
+\newpage
 \section{Database Schema}\label{database-schema}
-
-
-The schema is flat and has no relations. Each table contains
-information about its entity and geometry. Because imposm 3
-cannot match two types of polygons (e.g. polygon and point) we need
-to create a table for each geometry type.
-
-
-\subsection{Common Attributes}
-
-\subsubsection{OSM id}
-
-All tables and views that are derived from \osm{} data have keep the original \texttt{osm\_id}
-to trace back the data and be able to query a distinct \osm{} feature in a visual style.
-
-\subsubsection{Translations}
-
-All features that will get a label layer will contain several translations.
-
-\begin{flushleft}
-\begin{table}
-    \begin{tabular}{ll}
-    \hline
-     Field    & 	Description                                    \\
-    \hline
-    name      & Local name for the place.  \\
-    name\_en	 & English                          \\
-    name\_es	 & Spanish                          \\
-    name\_fr	 & French                           \\
-    name\_de	 & German                           \\
-    name\_ru	 & Russian                          \\
-    name\_zh	 & Chinese                          \\
-    \end{tabular}
-\end{table}
-\end{flushleft}
-
-
-\subsubsection{Type and Class}
-
-The class can be explained as a feature class. It is a categorization of a OSM value.
-The type is the OSM value of the feature.
-
+The schema is flat and has no relations. Each table contains information about its entity and geometry. 
 
 \subsection{OpenStreetMap Planet}
+
+The cornerstone of the entire map is \osm{} data from published snapshots from OSM Planet\footnote{\url{http://planet.osm.org/}}.
+\marginpar{The OSM data is perfect for high zoom levels where detailed coverage of local areas is important.}
+Smaller extracts for single countries and continents are available from Geofabrik\footnote{\url{http://download.geofabrik.de/}}.
+For  single cities or regions the Metro extracts from Mapzen\footnote{\url{https://mapzen.com/data/metro-extracts/}} can be used.
+
+The data is available in the PBF\footnote{\url{http://wiki.openstreetmap.org/wiki/PBF_Format}} and OSM XML format \footnote{\url{https://wiki.openstreetmap.org/wiki/OSM_XML}}. 
+Data in PBF format is 30\% smaller and 5-6 times faster to read and write than the bzipped OSM XML version.
+
+We use imposm3 to import the OSM data into our PostGIS database.
+Selected tags \footnote{\url{http://wiki.openstreetmap.org/wiki/Tags}} and their geometries are defined in an import mapping explicitly.
+Because imposm3 cannot match two types of polygons (e.g. polygon and point) we need
+to create a table for each geometry type.
 
 \begin{flushleft}
     \begin{tabular}{lll}
@@ -91,9 +216,10 @@ The type is the OSM value of the feature.
     \end{tabular}
 \end{flushleft}
 
-\subsection{Custom Curated Data}
+\subsection{Custom Curated Labels}
 
-Certain data is very delicate and has been added by hand.
+The placement and importance of labels of countries, states and oceans matters\footnote{\url{https://axismaps.github.io/thematic-cartography/articles/labeling.html}} and is important to get right. Data from the overpass API \footnote{\url{https://wiki.openstreetmap.org/wiki/Overpass_API}} is converted into GeoJSON and
+manually edited and enhanced with a label rank.
 
 \begin{flushleft}
     \begin{tabular}{lll}
@@ -108,8 +234,15 @@ Certain data is very delicate and has been added by hand.
 
 \subsection{OpenStreetMapData}
 
-We use the the water polygons\footnote{\url{http://openstreetmapdata.com/data/water-polygons}} 
-from OpenStreetMapData for oceans, seas and large lakes.
+Certain \osm{} data like borders and land polygons is very sensitive for change.
+The OpenStreetMapData\footnote{\url{http://openstreetmapdata.com/}}
+project takes care of alot of issues that happen with coastlines
+and provide it in a convenient format. The data is checked by the OSM community
+and released separately.
+
+We use water polygons \footnote{\url{http://openstreetmapdata.com/data/water-polygons}} from OpenStreetMapData. This data set ensures that the water polygons
+work well together with other \osm{} data and splits big water polygons into multiple 
+pieces for performance.
 
 \begin{flushleft}
     \begin{tabular}{lll}
@@ -120,14 +253,23 @@ from OpenStreetMapData for oceans, seas and large lakes.
     \end{tabular}
 \end{flushleft}
 
-
+\newpage
 \subsection{Natural Earth}
 
+The Natural Earth \footnote{\url{http://www.naturalearthdata.com/}} data set provides manually curated data of cultural and physical features of the world. Natural earth data is especially useful at higher levels when it matters alot what should not be displayed.
 
 The imported natural earth data results in more than 100 tables but only a few
 are relevant for our use case.
 We use country, state borders and large lakes from Natural Earth data for the lower zoom
 levels.
+We use the following data from Natural Earth:
+
+\begin{itemize}
+\item Label ranks of big cities\footnote{\url{http://www.naturalearthdata.com/downloads/10m-cultural-vectors/10m-populated-places/}}
+\item Major lakes\footnote{\url{http://www.naturalearthdata.com/downloads/10m-physical-vectors/10m-lakes/}}
+\item Country\footnote{\url{http://www.naturalearthdata.com/downloads/10m-cultural-vectors/10m-admin-0-countries/}} and administrative\footnote{\url{http://www.naturalearthdata.com/downloads/10m-cultural-vectors/10m-admin-1-states-provinces/}} borders including disputed borders\footnote{\url{http://www.naturalearthdata.com/downloads/10m-cultural-vectors/10m-admin-0-breakaway-disputed-areas/}}
+\end{itemize}
+
 
 
 \begin{flushleft}
@@ -150,6 +292,9 @@ levels.
 %------------------------------------------------------
 \newpage
 \section{Layer Schema}\label{layer-schema}
+
+The layer schema tries to stay compliant to the Mapbox Streets v6 layer reference \footnote{\url{https://www.mapbox.com/developers/vector-tiles/mapbox-streets-v6/}} and Mapbox Streets v5 layer reference\footnote{\url{https://www.mapbox.com/developers/vector-tiles/mapbox-streets-v5/}}.
+can be found in the following chapters.
 
 \begin{flushleft}
     \begin{tabular}{ll}
@@ -222,7 +367,6 @@ The \texttt{address} field is pulled together from the various address attribute
   \caption{Point of interest label layer}
 \end{figure}
 
-
 \newpage
 \subsection{Water}
 Water bodies for lower zoom levels are taken from Natural Earth
@@ -233,8 +377,6 @@ data while lakes and rivers are from \osm{}.
   \caption{Water bodies and river layers}
 \end{figure}
 
-
-
 \newpage
 \subsection{Places}
 The original \osm{} place data is enriched with scalerank data
@@ -244,63 +386,3 @@ from natural earth.
   \includegraphics[scale=0.6]{images/place_layer.png}
   \caption{Place label layer}
 \end{figure}
-
-
-
-%------------------------------------------------------
-\newpage
-\section{Package Diagrams}
-
-\subsection{Import}
-
-The entire import process is a combination of different smaller imports of different datasources.
-
-\paragraph{import-osm-data}
-Import of the OSM planet file with imposm 3 and a custom mapping configuration.
-
-\paragraph{import-sql}
-Custom SQL functions that make querying easier and generated SQL code for
-classifications.
-
-\paragraph{import-natural-earth}
-Import of Natural Earth data.
-
-\paragraph{import-scaleranks}
-Custom scalerank updates from Natural Earth data for better scaleranks in places.
-
-\paragraph{import-water}
-Water polygons from OpenStreetMapData.
-
-\begin{figure}[h]
-  \includegraphics[scale=0.6]{images/import_package.png}
-  \caption{Import package}
-\end{figure}
-
-\newpage
-\subsection{Export}
-Export can either be done locally which will process one bounding box or
-split up into several machines using remote features.
-
-\paragraph{open-streets.tm2source}
-The data style project is the most essential component which pulls together all the
-data of different datasources to create vector tile. 
-
-\paragraph{export-local}
-A process which is using the open-streets.tm2source project to create vector tiles for a
-given bounding box.
-
-\paragraph{export-remote}
-A worker implementation which uses a queue to read jobs and work through jobs with
-export-local.
-
-\paragraph{enqueue-jobs}
-Create jobs for certain areas automatically.
-
-\paragraph{merge}
-Merge results of jobs together into a final big file.
-
-\begin{figure}[h]
-  \includegraphics[scale=0.6]{images/export_package.png}
-  \caption{Export package}
-\end{figure}
-\newpage

@@ -5,9 +5,8 @@
 Creating a custom styled OSM map is one of the most common use cases
 among cartographers yet it is very difficult to do so. With the new
 emerging technology of vector tiles it is possible to allow anyone to
-create their custom OSM maps without downloading the entire database and
-managing complex infrastructure. The task of this project is to make
-this as easy as possible.
+create their custom OSM maps without setting up a database and
+managing complex infrastructure.
 
 %------------------------------------------------------
 
@@ -16,11 +15,10 @@ this as easy as possible.
 Michal Migurski published on March 15, 2013 a blog
 post\footnote{\url{http://mike.teczno.com/notes/postgreslessness-mapnik-vectiles.html}},
 in which he described his first attempts to use vector tiles as a source
-for the Mapnik tile renderer. In this post he describes the vision of
-vector tiles.
+for the Mapnik tile renderer and his vision for vector tiles.
 
-Vector tiles only contain geometries and meta data. The visual style can
-be applied when the tiles get requested. Since vector tiles do not
+Vector tiles only contain geometries and metadata. The visual style can
+be applied to a tile when it is requested. Since vector tiles do not
 contain any information about the style, they are smaller than raster
 tiles. This enables high resolution maps, fast map loads and efficient
 caching.
@@ -30,57 +28,53 @@ the data free and as Open Source project.
 
 %------------------------------------------------------
 
-\section{Targets}\label{targets}
+\section{Goals}\label{targets}
 
-The main target of this thesis is to allow anyone to create their custom
-OSM map without managing complex infrastructure. This main target is
-split into multiple sub targets, which we defined in the project proposal
-at the beginning.
+The main goal of this thesis is to allow anyone to create their custom
+OSM map without managing complex infrastructure. In order to complete this goal
+several deliverables were defined in the project proposal.
 
 \begin{itemize}
 \item
-  Deliver a Docker Container to create vector tiles from OSM Data
+  Deliver a Docker Container to create vector tiles from \osm{} data
 \item
-  Provide the vector tiles for Switzerland
+  Provide vector tiles for Switzerland
 \item
-  Provide a Docker Container to serve the vector tiles together with
-  custom styles as raster data
+  Provide a Docker container to serve the vector tiles together with
+  custom styles as raster tiles
 \item
   Optional: Vector tiles for the whole world
 \end{itemize}
 
 %--------------------------------------------------------
+\newpage
+\section{Project Procedure}
 
-\section{Project procedure}
-
-This project was roughly split into the following steps:
+The project was split into the following steps:
 
 \begin{itemize}
 \item
   Inception: Kickoff meeting with Petr Pridal, Stefan Keller and
   definition of project proposal
 \item
-  Prototyping: At the beginning we spent some time to get to know the
-  whole software stack and create a small prototype of every part.
+  Prototyping: Get to know the entire Mapbox software stack and create
+  a working prototype of every deliverable.
 \item
   Evaluation and Requirements: Evaluation of different parts of the
-  stack like data import tools, vector tile server. The evaluation of
+  stack like import tools and vector tile server. The evaluation of
   this technology as well as additional technologies are part of the
   section technology evaluation.
 \item
   Implementation: The creation of the map was an iterative process. We
-  started at the lowest zoom level (14) and implemented level by level up
+  started at the lowest zoom level 14 and implemented level by level up
   to zoom level 0. On the way we identified many different problems
   which are further described in the section implementation of the
-  project documentation. We documented all of our decisions during the
-  implementation process, so that Petr Pridal and Stefan Keller could
-  follow every step we took.
+  project documentation.
 \item
-  Optimizations: Once we had a first alpha version, we added an
-  additional data source (Natural Earth) to further improve the quality
-  of the upper zoom levels. During the implementation phase we did a
-  refactoring of the project structure and added continuous deployment
-  to our setup.
+  Optimization: After the first alpha version
+  additional data sources (Natural Earth) were added to further improve the quality
+  of the upper zoom levels. During the implementation phase the project structure
+  has been refactored and continuous integration was implemented.
 \item
   Rendering: At the end of the project there was a long period for the
   actual rendering of the vector tiles.
