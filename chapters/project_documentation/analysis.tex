@@ -6,13 +6,11 @@
 The project is divided into the \texttt{import} phase where
 the ETL process  happens and an \texttt{export} phase where the PostGIS data
 is transformed into vector tiles using the \texttt{open-streets} data style.
-The data style depends on the database schema defined by the \texttt{import}. 
-
-
+The data style depends on the database schema defined by the \texttt{import}.
+\\\\
 Along the way many additional development \texttt{tooling} was needed for the reverse engineering process and for improving developer productivity. Everything that is not needed during
 the workflow but only for development or verification is in this package.
-
-
+\\\\
 The infrastructure package contains specially configured programs as Docker images.
 It contains a PostGIS database, a connection pooler (pgbouncer) and a tessera based raster tile server.
 
@@ -60,7 +58,7 @@ remote machines. In this thesis we will only focus on local export.
 
 \paragraph{open-streets}
 The data style project is the most essential component which pulls together all the
-data of different datasources to create vector tile. 
+data of different datasources to create vector tiles. 
 
 \paragraph{export-local}
 A process which is using the open-streets.tm2source project to create vector tiles for a
@@ -80,7 +78,7 @@ A worker implementation which uses a queue to read jobs and work through jobs wi
 \newpage
 \subsection{Tooling}
 
-Tooling contains the various tools we work with.
+This chapter describes the various tools we created to support the development process.
 
 \paragraph{enqueue-jobs}
 Create jobs for certain areas automatically.
@@ -137,8 +135,8 @@ For convenience the \texttt{import-external-data} imports several data sources a
 \subsection{Export and Development Tools}
 
 For performance reason a connection pooler is in front of the actual \texttt{postgis} container.
-
-The raster tileserve can serve directly from the export directory where the generated MBTiles
+\\
+The raster tile server can serve directly from the export directory where the generated MBTiles
 are put. The \texttt{mapbox-studio} container allows editing the \texttt{open-streets} project and connects directly to the \texttt{postgis} container.
 
 \begin{figure}[h]
@@ -184,10 +182,10 @@ The cornerstone of the entire map is \osm{} data from published snapshots from O
 \marginpar{The OSM data is perfect for high zoom levels where detailed coverage of local areas is important.}
 Smaller extracts for single countries and continents are available from Geofabrik\footnote{\url{http://download.geofabrik.de/}}.
 For  single cities or regions the Metro extracts from Mapzen\footnote{\url{https://mapzen.com/data/metro-extracts/}} can be used.
-
+\\
 The data is available in the PBF\footnote{\url{http://wiki.openstreetmap.org/wiki/PBF_Format}} and OSM XML format \footnote{\url{https://wiki.openstreetmap.org/wiki/OSM_XML}}. 
 Data in PBF format is 30\% smaller and 5-6 times faster to read and write than the bzipped OSM XML version.
-
+\\
 We use imposm3 to import the OSM data into our PostGIS database.
 Selected tags \footnote{\url{http://wiki.openstreetmap.org/wiki/Tags}} and their geometries are defined in an import mapping explicitly.
 Because imposm3 cannot match two types of polygons (e.g. polygon and point) we need
@@ -232,15 +230,15 @@ manually edited and enhanced with a label rank.
     \end{tabular}
 \end{flushleft}
 
-\subsection{OpenStreetMapData}
+\subsection{OpenStreetMap Data}
 
 Certain \osm{} data like borders and land polygons is very sensitive for change.
 The OpenStreetMapData\footnote{\url{http://openstreetmapdata.com/}}
-project takes care of alot of issues that happen with coastlines
+project takes care of a lot of issues that happen with coastlines
 and provide it in a convenient format. The data is checked by the OSM community
 and released separately.
-
-We use water polygons \footnote{\url{http://openstreetmapdata.com/data/water-polygons}} from OpenStreetMapData. This data set ensures that the water polygons
+\\
+We use water polygons \footnote{\url{http://openstreetmapdata.com/data/water-polygons}} from OpenStreetMap Data. This data set ensures that the water polygons
 work well together with other \osm{} data and splits big water polygons into multiple 
 pieces for performance.
 
@@ -256,9 +254,9 @@ pieces for performance.
 \newpage
 \subsection{Natural Earth}
 
-The Natural Earth \footnote{\url{http://www.naturalearthdata.com/}} data set provides manually curated data of cultural and physical features of the world. Natural earth data is especially useful at higher levels when it matters alot what should not be displayed.
-
-The imported natural earth data results in more than 100 tables but only a few
+The Natural Earth \footnote{\url{http://www.naturalearthdata.com/}} data set provides manually curated data of cultural and physical features of the world. Natural Earth data is especially useful at higher zoom levels.
+\\
+The imported Natural Earth data results in more than 100 tables, but only a few
 are relevant for our use case.
 We use country, state borders and large lakes from Natural Earth data for the lower zoom
 levels.
@@ -293,8 +291,7 @@ We use the following data from Natural Earth:
 \newpage
 \section{Layer Schema}\label{layer-schema}
 
-The layer schema tries to stay compliant to the Mapbox Streets v6 layer reference \footnote{\url{https://www.mapbox.com/developers/vector-tiles/mapbox-streets-v6/}} and Mapbox Streets v5 layer reference\footnote{\url{https://www.mapbox.com/developers/vector-tiles/mapbox-streets-v5/}}.
-can be found in the following chapters.
+The layer schema tries to stay compliant to the Mapbox Streets v6 layer reference \footnote{\url{https://www.mapbox.com/developers/vector-tiles/mapbox-streets-v6/}} and Mapbox Streets v5 layer reference\footnote{\url{https://www.mapbox.com/developers/vector-tiles/mapbox-streets-v5/}}. The detailed documentation on which database tables are mapped to which feature classes, can be found in the following sections.
 
 \begin{flushleft}
     \begin{tabular}{ll}
@@ -326,8 +323,8 @@ can be found in the following chapters.
 \newpage
 \subsection{Aeroways, Barriers and Landusages}
 
-For alot of layers linestring and polygon data needs to be converted into
-linestrings for the layers.
+For a lot of layers linestring and polygon data needs to be converted into
+linestrings for the feature class.
 
 \begin{figure}[h]
   \centering
@@ -337,7 +334,7 @@ linestrings for the layers.
 
 \newpage
 \subsection{Administrative Borders}
-Administrative area at lower zoom levels is entirely from Natural Earth.
+The administrative area on lower zoom levels is entirely from Natural Earth data.
 
 \begin{figure}[h]
   \centering
@@ -357,7 +354,7 @@ Roads are split up into normal roads, tunnels and bridges after a certain zoom l
 
 \newpage
 \subsection{Points of Interest}
-Most POIs are in fact points but buildings tagged with POI attributes
+Most POIs are in fact points, but buildings tagged with POI attributes
 are often polygons, which is why we need to create tables for both points and polygons.
 The \texttt{localrank} and \texttt{scalerank} of the \texttt{\#poi\_label} layer are calculated from the \texttt{type} and \texttt{area} attributes.
 The \texttt{address} field is pulled together from the various address attributes on the tables (\texttt{street}, \texttt{housenumber}, \texttt{place}, \texttt{city}, \texttt{postcode} and \texttt{country}).
@@ -380,7 +377,7 @@ data while lakes and rivers are from \osm{}.
 \newpage
 \subsection{Places}
 The original \osm{} place data is enriched with scalerank data
-from natural earth.
+from Natural Earth.
 
 \begin{figure}[h]
   \includegraphics[scale=0.6]{images/place_layer.png}

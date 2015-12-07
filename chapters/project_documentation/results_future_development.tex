@@ -4,7 +4,7 @@
 The result of this study thesis are described in Part 1, \hyperref[part1_results]{\emph{section 4.1}}.
 
 \section{Future Development}\label{part2_future_development}
-The first version of our vector tiles have shown, that it is possible to get very close to compatibility with Mapbox Streets in a reasonable amount of time. There are still some quirks, which needs to be ironed out but we created a good foundation for future development. The two sections below describe small improvements and new features which will be implemented in our bachelor thesis.
+The first version of our vector tiles have shown, that it is possible to get very close to compatibility with Mapbox Streets in a reasonable amount of time. There are still some quirks, which needs to be ironed out, but we created a good foundation for future development. The two sections below describe small improvements and new features, which will be implemented in our bachelor thesis.
 
 \subsection{Small improvements}\label{small_improvements}
  
@@ -15,7 +15,7 @@ The scalerank of the place, marine, state and road labels should be improved. Ou
 State labels are used to display states of big countries like USA, Russia or China. More state labels could be added. 
 
 \paragraph{Country boundaries}
-At the moment we use a mix of Natural Earth and OSM data for the administrative boundaries. We had to implement this layer with data of both data sources, because we had some graphical issues with the OSM data on small zoom levels. Using Natural Earth data alone is not suitable, because the data is generalized. Therefore it does not look good on high zoom levels.
+At the moment we use a mix of Natural Earth and OSM data for the administrative boundaries. We had to implement this layer with data of both data sources, because we had some graphical issues with the OSM data on small zoom levels. Using Natural Earth data alone is not suitable, because the data is generalized. Therefore it does not look good on higher zoom levels. We could probably find a better data source for administrative boundaries.
 
 \paragraph{Country Name Translation Rule}
 Mapbox has defined a fallback rule\footnote{\url{https://www.mapbox.com/developers/vector-tiles/mapbox-streets-v6/}} for the country names. We struggled implementing it and had to prioritize on other features.
@@ -24,10 +24,10 @@ Mapbox has defined a fallback rule\footnote{\url{https://www.mapbox.com/develope
 Mapbox uses different maki icons\footnote{\url{https://www.mapbox.com/maki/}} for the road labels in the US.  
 
 \paragraph{Possiblity of Mapbox Terrain Visual Style}
-Check if all the data required for a Mapbox style like Mapbox Rerrain\footnote{\url{https://www.mapbox.com/developers/vector-tiles/mapbox-terrain/}} is included in our vector tiles
+Check if all the data required for a Mapbox style like Mapbox Terrain\footnote{\url{https://www.mapbox.com/developers/vector-tiles/mapbox-terrain/}} is included in our vector tiles
 
 \paragraph{Exclude Water in Rendering Process}
-When we implemented the vector tile rendering process, we realized that a lot of rendering time could be saved when the water (no data) is excluded. It turned out, that deciding if a vector tiles will have no data, is not an easy problem. So we just render everything and remove the "empty" vector tiles afterwards.  
+When we implemented the vector tile rendering process, we realized that a lot of rendering time could be saved when the water (no data) is excluded. It turned out, that deciding if a vector tiles will have no data, is not an easy problem. So we just render everything and remove the "empty" vector tiles afterwards.
 
 \subsection{New Features}\label{new_features}
 
@@ -38,7 +38,7 @@ One of the main targets of our bachelor thesis is to render the vector tiles of 
 A big request of the Swiss OSM community was to provide updated vector tiles based on the diff\footnote{\url{http://wiki.openstreetmap.org/wiki/Planet.osm/diffs}} files.
 
 \paragraph{Faster Tile Server}
-During our research of existing vector tile servers we found out, that there is no robust, scalable vector tile server available. This could maybe even be a separate project.
+During our research of existing vector tile servers we found out, that there is no robust, scalable vector tile server available. This could may even be a separate project.
 
 \paragraph{GeoName Search}
 If we want to fulfill the long term goal of this project to provide an offline map, we should definitly implement basic GeoName search capability.

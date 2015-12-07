@@ -21,14 +21,14 @@ Customizing a schema to already split up features into separate tables
 makes querying more performant and easier to do.
 
 \paragraph{Diff Updates}
-It must be possible to applying Planet diffs \footnote{\url{http://wiki.openstreetmap.org/wiki/Planet.osm/diffs}} 
+It must be possible to apply the Planet diffs \footnote{\url{http://wiki.openstreetmap.org/wiki/Planet.osm/diffs}} 
 to continuously update the database with newer data.
-
+\\
 If a import is very fast it is also possible to simply reimport the latest
 planet dump.
 
 \paragraph{Existing Data Style Projects}
-In order to get started it is helpful to have alot of query example
+In order to get started it is helpful to have a lot of query examples
 from other data style projects available.
 
 \subsection{Evaluation Matrix}\label{evaluation_matrix}
@@ -57,19 +57,12 @@ simple schema(line, point, polygon and
 roads)\footnote{\url{http://wiki.openstreetmap.org/wiki/Osm2pgsql/schema}}.
 This results in very large tables, so it is recommended to create good
 indices. Osm2pgsql supports updating of the database, if the values have
-been stored as hstore.
-
-The schema can be adapted via the import style \footnote{\url{http://wiki.openstreetmap.org/wiki/Osm2pgsql\#Import_style}}
+been stored as hstore. The schema can be adapted via the import style \footnote{\url{http://wiki.openstreetmap.org/wiki/Osm2pgsql\#Import_style}}
 but most projects use the default style\footnote{\url{https://github.com/openstreetmap/osm2pgsql/blob/master/default.style}} provided by osm2pgsql.
-
-For our use case it is important, that the import is efficent and that
-the import tool supports updating based on OSM diff files. Imposm 3 is
-faster than osm2pgsql and supports updatability. So we decided to take
-imposm for importing.
 
 \subsubsection{Imposm 3 }\label{imposm-importer}
 
-Imposm is an import tool for osm data, it is not a schema. But it
+Imposm is an import tool for OSM data, it is not a schema. But it
 defines a default
 schema\footnote{\url{http://imposm.org/docs/imposm/latest/database_schema.html}},
 which could possibly be changed by provinding a custom mapping file. An
@@ -78,7 +71,10 @@ tables. Which results in smaller tables and simpler queries. Imposm 3
 supports updating the database from OSM diff
 files\footnote{\url{http://imposm.org/docs/imposm3/latest/tutorial.html\#diff}}
 
-TODO: formulate decision
+\paragraph{Decision} For our use case it is important, that the import is efficent and that
+the import tool supports updating based on OSM diff files. Imposm 3 is
+faster than osm2pgsql and supports updatability. So we decided to take
+imposm for importing.
 
 \section{Vector Tile Format}\label{vector-tile-formats}
 
@@ -108,19 +104,22 @@ Google Maps is using vector tiles since 2010 under the hood and was the
 first provider implementing this. Styling is limited and the format
 proprietary.
 
-TODO: formulate decision
+\paragraph{Decision} Because one of the main requirements of this project was to provide Mapbox Streets compatible vector tiles and Mapbox provides very good tools to handle vector tiles, we had almost no other choice than going with Mapbox's implementation of vector tiles.
 
 \section{Vector Tile Server}\label{vector_tile_server}
 
-Next to the vector tiles for Switzerland, the second deliverable is a basic vector tile server. So that even a non technical person can get started quickly with our vector tiles.\newline{}
+Next to the vector tiles for Switzerland, the second deliverable is a basic vector tile server. So that even a non technical person can get started quickly with our vector tiles.\\
 When we did some research on open source projects of vector tile servers, we found out that most of the people build their tile server set-up specifically for their use case. So there wasn't a typical solution present like Postgres is for the spatial databases.
 
 \subsection{Tessera}\label{tessera}
 
-Tessera is basically a Node.js webserver, which uses Mapbox's tilelive\footnote{\url{https://github.com/mapbox/tilelive}} modules to read vector tiles and generate raster tiles of it.
-TODO: Add diagramm with architecture
+Tessera is basically a Node.js webserver, which uses Mapbox's tilelive\footnote{\url{https://github.com/mapbox/tilelive}} modules to read vector tiles and generates raster tiles of it.
+\begin{figure}[H]
+  \includegraphics[scale=0.6]{images/tessera_node_bindings.png}
+  \caption{Architecture Diagramm Tessera}
+\end{figure}\\
 We did load tests to get some metrics on how the server is performing.
-
+\\
 Infrastructure: AWS EC2 t2.micro instance(1 GB Memory / 1 Core)
 Task: Zooming in from zoom level 10 to 22
 Conditions: 50 concurrent users
@@ -143,13 +142,16 @@ Results:
 ---- Errors --------------------------------------------------------------------
 > java.util.concurrent.TimeoutException: Request timed out to ec      2 (100.0%)
 2-52-30-184-45.eu-west-1.compute.amazonaws.com/52.30.184.45:80...
-\end{bashcode}
+\end{bashcode} \\
 
 With 50 concurrent users tessera was still able to respond to all requests in less than 1200 ms.
 
 \subsection{OpenStreetMap "Standard" tile server}\label{osm_standard_tile_server}
 Our adviser Petr Pridal recommended to reimplement the OSM standard raster tile server for the use of vector tiles. The OSM standard raster tile server consists of Apache as webserver and a custom Apache module called mod\_tile\footnote{\url{http://wiki.openstreetmap.org/wiki/Mod_tile}} for the rendering of raster tiles. This is a proven set-up as it is in production since years, but it was designed a long time ago when nobody though about vector tiles.
-
+\begin{figure}[H]
+  \includegraphics[scale=0.6]{images/mod_tile.png}
+  \caption{Architecture Diagramm OSM Standard tile server}
+\end{figure} \\
 Petr Pridals proposal was instead of having a geospatial database as datasource like the "old" raster tile server, switching the datasource to vector tiles. The task would have been to implement a custom Apache module which reads the vector tiles, renders them with mapnik and provides them to the apache webserver.
 
 \subsection{Decision}\label{tile_server_decision}
