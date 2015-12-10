@@ -4,6 +4,231 @@ The most promising vector tile specification was proposed by Mapbox.
 \marginpar{The Mapbox Vector Tile Specification is compared with other vector tile formats in chapter \ref{vector-tile-formats}}
 They provide many open source tools to manage vector tiles. We tried not to implement tools which already exists and instead use as many existing tools as possible. Because of this our implementation consists mostly of docker containers which do a specific task.
 
+\section{Mapping}
+
+Imposm 3 requires a custom mapping file to decide which tags and geometries are mapped into which table.
+
+The example data mapping\footnote{\url{http://imposm.org/docs/imposm3/latest/mapping.html}} defines that geometries of type polygon with the key value pairs \texttt{natural=wood}, \texttt{natural=land} and \texttt{tourism=zoo} should be mappend into the \texttt{landusages} table.
+
+\begin{yamlcode}
+tables:
+   landusages:
+     type: polygon
+     mapping:
+       natural: [wood, land]
+       tourism: [zoo]
+\end{yamlcode}
+
+Instead of mapping all values of a certain key a explicit mapping strategy has been chosen. Each tag was explicitly defined in the mapping. This required mapping a lot of tags (to map all sport POIs over 79 tags are mapped) but has the benefit of knowing exactly which tags are in the database which makes querying and filtering easier.
+
+\begin{figure}[H]
+  \includegraphics[width=1\textwidth]{images/mapping_keys.png}
+  \caption{Mapping of tags to tables}
+\end{figure}
+
+
+
+\section{Database Schema}
+
+This section describes the implementation details of the database schema.
+
+\subsection{OSM id}
+All tables and views that are derived from \osm{} data has the original id\footnote{\url{https://wiki.openstreetmap.org/wiki/64-bit_Identifiers}}
+to trace back the data and be able to query a distinct \osm{} feature in a visual style.
+
+\subsection{Translations}
+All features which are label layers will contain several translations.
+The translations are directly mapped from the suffixed language code \footnote{\url{https://wiki.openstreetmap.org/wiki/Key:name}}. If a field is not available in the language, the local name is used.
+
+\begin{flushleft}
+    \begin{tabular}{ll}
+    \hline
+     Field    & 	Description                                    \\
+    \hline
+    name      & Local name  \\
+    name\_en	 & English                          \\
+    name\_es	 & Spanish                          \\
+    name\_fr	 & French                           \\
+    name\_de	 & German                           \\
+    name\_ru	 & Russian                          \\
+    name\_zh	 & Chinese                          \\
+    \end{tabular}
+\end{flushleft}
+
+\subsection{Type and Class}
+The class can be explained as a feature class. It is a categorization of an OSM value.
+The type is the OSM value of the feature.
+
+\section{Classification}
+\label{classification}
+
+The OpenStreetMap tagging schema has developed into a complex taxonomy of real-world feature classes and objects. \cite[p. 15]{haklay2008openstreetmap}. Map designers don't want to design
+for each distinct object specifically which is why Mapbox and others abstract distinct key value pairs into so called feature classes. Mapbox calls those feature class simply class. Mapping created key value pairs into categories, cannot be automated
+and there is no standard. This is why we have done it by hand.
+\\
+A map designer that wants to style agricultural areas does not care
+what type of field it is.
+
+\begin{flushleft}
+\begin{tabular}{llll}
+Key      & Value      & Class       & Type           \\
+\hline
+landuse  & farm       & agriculture & orchard        \\
+building & farm       & agriculture & farm           \\
+landuse  & farmland   & agriculture & farmland       \\
+landuse  & farmyard   & agriculture & farmyard       \\
+landuse  & allotments & agriculture & allotments     \\
+landuse  & vineyard   & agriculture & vineyard       \\
+landuse  & vineyard   & agriculture & plant\_nursery
+\end{tabular}
+\end{flushleft}
+
+\subsection{Classification Format}
+
+We created the classifications in a YAML based format.
+Where each key in \texttt{classifications} denotes the classification name. The elements within each classification (e.g. \texttt{driveway} or \texttt{main} are the class name and the values below the class name (e.g. \texttt{primary}, \texttt{primary\_link} the OSM values to match. We do not explicitly match the OSM keys as well - only the values.
+
+\begin{yamlcode}
+classifications:
+  road:
+    highway:
+    - motorway
+    - motorway_link
+    - driveway
+    main:
+    - primary
+    - primary_link
+    - trunk
+    - trunk_link
+    - secondary
+    - secondary_link
+    - tertiary
+    - tertiary_link
+\end{yamlcode}
+
+\subsection{Code Generation}
+
+We take the readable classification format and generate immutable SQL
+functions which we can use in our queries.
+The example above will result in the following function.
+
+\begin{sqlcode}
+CREATE OR REPLACE FUNCTION classify_road(type VARCHAR)
+RETURNS VARCHAR AS $$
+  BEGIN
+    RETURN CASE
+      WHEN type IN ('motorway','motorway_link','driveway') THEN 'highway'
+      WHEN type IN ('primary','primary_link',
+                    'trunk','trunk_link',
+                    'secondary','secondary_link',
+                    'tertiary','tertiary_link') THEN 'main'
+    END;
+  END;
+$$ LANGUAGE plpgsql IMMUTABLE;
+\end{sqlcode}
+\\
+Classifications are then baked into vector tile attributes
+of geometries.
+
+\begin{sqlcode}
+SELECT
+  geometry,
+  classify_road(type) AS class,
+  type AS type
+FROM osm_roads
+\end{sqlcode}
+
+\section{Relative Importance}
+\label{localrank}
+
+To reduce label density on lower zoom levels, but still contain all data in e.g. zoom level 14, the \texttt{localrank} attribute indiciates how
+important a label is compared to the labels in its neighbourhood.
+
+\subsection{Calculating Rank}
+
+\subsubsection{Order Features by their Types}
+
+In the best case scenario a function would rank each point of interest class.
+Due to limited time we only explicitly ranked the most important features.
+
+\begin{sqlcode}
+CREATE OR REPLACE FUNCTION localrank_poi(type VARCHAR) RETURNS INTEGER
+AS $$
+BEGIN
+  RETURN CASE
+    WHEN type IN ('station', 'subway_entrance', 'park',
+                  'cemetery', 'bank', 'supermarket', 'car',
+                  'library', 'university', 'college', 'police',
+                  'townhall', 'courthouse') THEN 2
+    WHEN type IN ('nature_reserve', 'garden', 'public_building') THEN 3
+    WHEN type IN ('stadium') THEN 90
+    WHEN type IN ('hospital') THEN 100
+    WHEN type IN ('zoo') THEN 200
+    WHEN type IN ('university', 'school', 'college', 'kindergarten') THEN 300
+    WHEN type IN ('supermarket', 'department_store') THEN 400
+    WHEN type IN ('nature_reserve', 'swimming_area') THEN 500
+    WHEN type IN ('attraction') THEN 600
+    ELSE 1000
+  END;
+END;
+$$ LANGUAGE plpgsql IMMUTABLE;
+\end{sqlcode}
+
+
+\subsubsection{Calculate Rank across Grid}
+
+The rank is calculated across a grid of 128 pixels. The most
+important features from the \texttt{localrank\_poi} function will
+also be the most relevant POIs.
+
+\begin{sqlcode}
+SELECT
+  geometry,
+  rank() OVER (PARTITION BY LabelGrid(geometry, 128 * !pixel_width!)
+               ORDER BY localrank_poi(type) ASC) AS localrank,
+FROM osm_poi
+\end{sqlcode}
+
+\section{PostgreSQL Performance}
+\label{postgres-performance}
+
+The most intensive work is done on the database side to respond to all SQL queries made by Mapnik in the fastest way possible.
+
+\subsection{Tuning}
+
+The PostgreSQL default parameters do not deliver good performance for stronger machines\footnote{\url{https://wiki.postgresql.org/wiki/Tuning_Your_PostgreSQL_Server}-}
+For the different database machines PgTune\footnote{\url{http://pgtune.leopard.in.ua/}} calculator has been used to determine good cache and buffer sizes for data warehouse style computing.
+\\
+Example configuration for a host with 50 GB of memory.
+
+\begin{bashcode}
+max_connections = 20
+shared_buffers = 12800MB
+effective_cache_size = 38400MB
+work_mem = 320MB
+maintenance_work_mem = 2GB
+checkpoint_segments = 128
+checkpoint_completion_target = 0.9
+wal_buffers = 16MB
+default_statistics_target = 500
+\end{bashcode}
+
+For speed up the import, we disabled transactional features of PostgreSQL. \footnote{\url{http://www.databasesoup.com/2015/02/running-with-scissors-mode.html}}.
+
+\begin{bashcode}
+bgwriter_lru_maxpages = 0
+wal_level = minimal
+fsync = off
+synchronous_commit = off
+full_page_writes = off
+wal_log_hints = off
+\end{bashcode}
+
+\subsection{Indizes}
+
+We use clustered indizes on the geometries to provide fast tile lookup.
+TODO: More details
+
 \section{Data Style}\label{data_style}
 
 The data style is a description of all the feature classes such as landuse, water or roads. This description was invented by Mapbox.
@@ -67,7 +292,6 @@ properties:
     "buffer-size": 4
 \end{yamlcode}
 The layer definition consist of the id (layername), datasource, fields and the properties. The datasource in this case defines how the postgis database can be accessed and which sql query needs to be executed. But the datasource could also be a geojson, shapefile, sqlite database, geotiff, kml, gpx or csv file.
-
 
 \subsubsection{Buffers}\label{buffers}
 The buffer value on a layer defines how many pixels around each tile will be included. It is necessary to ensure correct rendering across tile boundaries. This value is individual for each layer and depends on the type of data. Buffers for layers containing labels should have a large buffer size such as 128 pixels, whereas a layer like landuse does only need a buffers size of 4 pixels. In general, the buffer size should be set to the minimum to keep the size of the vector tiles as low as possible.\footnote{\url{https://www.mapbox.com/help/source-manual/\#buffers}}
@@ -178,145 +402,10 @@ Mapbox Streets v6 vector tile(0/0/0):
 }
 \end{jsoncode}
 
-\section{Mapping}
-
-Imposm 3 requires a custom mapping file to decide which tags and geometries are mapped into which table.
-
-The example data mapping\footnote{\url{http://imposm.org/docs/imposm3/latest/mapping.html}} defines that geometries of type polygon with the key value pairs \texttt{natural=wood}, \texttt{natural=land} and \texttt{tourism=zoo} should be mappend into the \texttt{landusages} table.
-
-\begin{yamlcode}
-tables:
-   landusages:
-     type: polygon
-     mapping:
-       natural: [wood, land]
-       tourism: [zoo]
-\end{yamlcode}
-
-Instead of mapping all values of a certain key a explicit mapping strategy has been chosen. Each tag was explicitly defined in the mapping. This required mapping a lot of tags (to map all sport POIs over 79 tags are mapped) but has the benefit of knowing exactly which tags are in the database which makes querying and filtering easier.
-
-\begin{figure}[H]
-  \includegraphics[width=1\textwidth]{images/mapping_keys.png}
-  \caption{Mapping of tags to tables}
-\end{figure}
-
-
-
-\section{Database Schema}
-
-This section describes the implementation details of the database schema.
-
-\subsubsection{OSM id}
-All tables and views that are derived from \osm{} data has the original id\footnote{\url{https://wiki.openstreetmap.org/wiki/64-bit_Identifiers}}
-to trace back the data and be able to query a distinct \osm{} feature in a visual style.
-
-\subsubsection{Translations}
-All features which are label layers will contain several translations.
-The translations are directly mapped from the suffixed language code \footnote{\url{https://wiki.openstreetmap.org/wiki/Key:name}}. If a field is not available in the language, the local name is used.
-
-\begin{flushleft}
-    \begin{tabular}{ll}
-    \hline
-     Field    & 	Description                                    \\
-    \hline
-    name      & Local name  \\
-    name\_en	 & English                          \\
-    name\_es	 & Spanish                          \\
-    name\_fr	 & French                           \\
-    name\_de	 & German                           \\
-    name\_ru	 & Russian                          \\
-    name\_zh	 & Chinese                          \\
-    \end{tabular}
-\end{flushleft}
-
-\subsubsection{Type and Class}
-The class can be explained as a feature class. It is a categorization of an OSM value.
-The type is the OSM value of the feature.
-
-\section{Classification}
-\label{classification}
-
-The OpenStreetMap tagging schema has developed into a complex taxonomy of real-world feature classes and objects. \cite[p. 15]{haklay2008openstreetmap}. Map designers don't want to design
-for each distinct object specifically which is why Mapbox and others abstract distinct key value pairs into so called feature classes. Mapbox calls those feature class simply class. Mapping created key value pairs into categories, cannot be automated
-and there is no standard. This is why we have done it by hand.
-\\
-A map designer that wants to style agricultural areas does not care
-what type of field it is.
-
-\begin{flushleft}
-\begin{tabular}{llll}
-Key      & Value      & Class       & Type           \\
-\hline
-landuse  & farm       & agriculture & orchard        \\
-building & farm       & agriculture & farm           \\
-landuse  & farmland   & agriculture & farmland       \\
-landuse  & farmyard   & agriculture & farmyard       \\
-landuse  & allotments & agriculture & allotments     \\
-landuse  & vineyard   & agriculture & vineyard       \\
-landuse  & vineyard   & agriculture & plant\_nursery
-\end{tabular}
-\end{flushleft}
-
-\subsection{Classification Format}
-
-We created the classifications in a YAML based format.
-Where each key in \texttt{classifications} denotes the classification name. The elements within each classification (e.g. \texttt{driveway} or \texttt{main} are the class name and the values below the class name (e.g. \texttt{primary}, \texttt{primary\_link} the OSM values to match. We do not explicitly match the OSM keys as well - only the values.
-
-\begin{yamlcode}
-classifications:
-  road:
-    highway:
-    - motorway
-    - motorway_link
-    - driveway
-    main:
-    - primary
-    - primary_link
-    - trunk
-    - trunk_link
-    - secondary
-    - secondary_link
-    - tertiary
-    - tertiary_link
-\end{yamlcode}
-
-\subsection{Code Generation}
-
-We take the readable classification format and generate immutable SQL
-functions which we can use in our queries.
-The example above will result in the following function.
-
-\begin{sqlcode}
-CREATE OR REPLACE FUNCTION classify_road(type VARCHAR)
-RETURNS VARCHAR AS $$
-  BEGIN
-    RETURN CASE
-      WHEN type IN ('motorway','motorway_link','driveway') THEN 'highway'
-      WHEN type IN ('primary','primary_link',
-                    'trunk','trunk_link',
-                    'secondary','secondary_link',
-                    'tertiary','tertiary_link') THEN 'main'
-    END;
-  END;
-$$ LANGUAGE plpgsql IMMUTABLE;
-\end{sqlcode}
-\\
-Classifications are then baked into vector tile attributes
-of geometries.
-
-\begin{sqlcode}
-SELECT
-  geometry,
-  classify_road(type) AS class,
-  type AS type
-FROM osm_roads
-\end{sqlcode}
-
-
-\subsection{Tools}\label{tools}
+\section{Quality Assurance Tools}\label{tools}
 During the prototyping phase we realized, that we need to build tools which help us track the progress of compatibility.
 
-\subsubsection{Vector Tile Compare}\label{vector_tile_compare}
+\subsection{Vector Tile Compare}\label{vector_tile_compare}
 The Vector Tile Compare tool analyzes vector tiles and outputs interesting information like layers and attributes. We generated this output for the same vector tiles of Mapbox Streets and our own (Open Streets). Next we uploaded the results to a Github repository and used the branch compare feature to compare them. 
 
 \begin{figure}[H]
@@ -327,7 +416,7 @@ The Vector Tile Compare tool analyzes vector tiles and outputs interesting infor
 
 This gave us a good indicator of which layers are shown on which zoom level and what attributes are contained in a layer.
 
-\subsubsection{Visual Compare}\label{visual_compare}
+\subsection{Visual Compare}\label{visual_compare}
 The vector tile comparison was good to ensure that we have exactly the same data on the same zoom level. But when we started to visually compare our map with the map of Mapbox Streets, we still saw big differences. So we decided to build a visual compare tool. 
 
 \begin{figure}[H]
@@ -338,96 +427,8 @@ The vector tile comparison was good to ensure that we have exactly the same data
 
 The figure above shows a screenshot of the Visual Compare tool. On the left side is Mapbox Streets and on the right side our Open Streets map. They both use the same visual style (OSM Bright 2\footnote{\url{https://github.com/mapbox/mapbox-studio-osm-bright.tm2}}). When you zoom in on the right side of the map, it automatically zooms in on the left side. This tool was very helpful to find all the differences.
 
-\subsection{Working Methods}
+\section{Improvement Process}
 This section describes what we did, when we found a visual difference. When we identified a visual difference with the Vector Compare or Visual Compare tool, we first checked if the missing data is included in our import mapping. If this was not the case, we used the TagFinder tool\footnote{\url{https://wiki.openstreetmap.org/wiki/TagFinder}} to find the right OSM key, value pair of the missing item. Next we included the key, value pair into our import mapping and re-imported the OSM data. To see the item on the map, the SQL query in the data style needs to be altered to fetch the added item. Now the missing item should appear on the map. During this process we used mostly Mapbox Studio Classic\footnote{\url{https://www.mapbox.com/mapbox-studio-classic/}} as the map can be rendered on the fly after the query has been altered.
 
-\section{PostgreSQL Performance}
-\label{postgres-performance}
-
-The most intensive work is done on the database side to respond to all SQL queries made by Mapnik in the fastest way possible.
-
-\subsection{Tuning}
-
-The PostgreSQL default parameters do not deliver good performance for stronger machines\footnote{\url{https://wiki.postgresql.org/wiki/Tuning_Your_PostgreSQL_Server}-}
-For the different database machines PgTune\footnote{\url{http://pgtune.leopard.in.ua/}} calculator has been used to determine good cache and buffer sizes for data warehouse style computing.
-\\
-Example configuration for a host with 50 GB of memory.
-
-\begin{bashcode}
-max_connections = 20
-shared_buffers = 12800MB
-effective_cache_size = 38400MB
-work_mem = 320MB
-maintenance_work_mem = 2GB
-checkpoint_segments = 128
-checkpoint_completion_target = 0.9
-wal_buffers = 16MB
-default_statistics_target = 500
-\end{bashcode}
-
-For speed up the import, we disabled transactional features of PostgreSQL. \footnote{\url{http://www.databasesoup.com/2015/02/running-with-scissors-mode.html}}.
-
-\begin{bashcode}
-bgwriter_lru_maxpages = 0
-wal_level = minimal
-fsync = off
-synchronous_commit = off
-full_page_writes = off
-wal_log_hints = off
-\end{bashcode}
-
-\subsection{Indizes}
-
-We use clustered indizes on the geometries to provide fast tile lookup.
-TODO: More details
-
-\section{Relative Importance}
-\label{localrank}
-
-To reduce label density on lower zoom levels, but still contain all data in e.g. zoom level 14, the \texttt{localrank} attribute indiciates how
-important a label is compared to the labels in its neighbourhood.
-
-\subsection{Calculating Rank}
-
-\subsubsection{Order Features by their Types}
-
-In the best case scenario a function would rank each point of interest class.
-Due to limited time we only explicitly ranked the most important features.
-
-\begin{sqlcode}
-CREATE OR REPLACE FUNCTION localrank_poi(type VARCHAR) RETURNS INTEGER
-AS $$
-BEGIN
-  RETURN CASE
-    WHEN type IN ('station', 'subway_entrance', 'park',
-                  'cemetery', 'bank', 'supermarket', 'car',
-                  'library', 'university', 'college', 'police',
-                  'townhall', 'courthouse') THEN 2
-    WHEN type IN ('nature_reserve', 'garden', 'public_building') THEN 3
-    WHEN type IN ('stadium') THEN 90
-    WHEN type IN ('hospital') THEN 100
-    WHEN type IN ('zoo') THEN 200
-    WHEN type IN ('university', 'school', 'college', 'kindergarten') THEN 300
-    WHEN type IN ('supermarket', 'department_store') THEN 400
-    WHEN type IN ('nature_reserve', 'swimming_area') THEN 500
-    WHEN type IN ('attraction') THEN 600
-    ELSE 1000
-  END;
-END;
-$$ LANGUAGE plpgsql IMMUTABLE;
-\end{sqlcode}
 
 
-\subsubsection{Calculate Rank across Grid}
-
-The rank is calculated across a grid of 128 pixels. The most
-important features from the \texttt{localrank\_poi} function will
-also be the most relevant POIs.
-
-\begin{sqlcode}
-SELECT
-  geometry,
-  rank() OVER (PARTITION BY LabelGrid(geometry, 128 * !pixel_width!)
-               ORDER BY localrank_poi(type) ASC) AS localrank,
-FROM osm_poi
-\end{sqlcode}
