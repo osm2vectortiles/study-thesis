@@ -1,24 +1,7 @@
-HSR Student Research Project Thesis
+HSR Student Research Project Thesis [![PDF Status](https://www.sharelatex.com/github/repos/osm2vectortiles/osm2vectortiles-thesis/builds/latest/badge.svg)](https://www.sharelatex.com/github/repos/osm2vectortiles/osm2vectortiles-thesis/builds/latest/output.pdf)
 ===================================
+This repository contains the research project thesis for osm2vectortiles.
 
-Building
---------
-
-Dependencies (Arch Linux)::
-
-    $ pacman -S make python2 texlive-core texlive-latexextra \
-                texlive-fontsextra texlive-pictures texlive-science
-
-Git submodules::
-
-    $ git submodule init
-    $ git submodule update
-
-Building::
-
-    $ make
-
-Work in progress: http://latexbuilder.dbrgn.ch/pdf/hsr-sa/main.pdf
 
 License / Credits
 -----------------
