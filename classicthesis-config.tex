@@ -46,9 +46,14 @@
 \newcounter{dummy} % Necessary for correct hyperlinks (to index, bib, etc.)
 \providecommand{\mLyX}{L\kern-.1667em\lower.25em\hbox{Y}\kern-.125emX\@}
 
-%----------------------------------------------------------------------------------------
+%-----------------------------------------------
+%	Remove indent after figures and tables
+%-----------------------------------------------
+\setlength{\parindent}{0pt}
+
+%-----------------------------------------------
 %	PACKAGES
-%----------------------------------------------------------------------------------------
+%-----------------------------------------------
 
 \usepackage{lipsum} % Used for inserting dummy 'Lorem ipsum' text into the template
 
@@ -93,7 +98,6 @@
 
 \PassOptionsToPackage{smaller}{acronym} % Include printonlyused in the first bracket to only show acronyms used in the text
 \usepackage{acronym} % nice macros for handling all acronyms in the thesis
-
 %------------------------------------------------
 
 %\renewcommand*{\acsfont}[1]{\textssc{#1}} % For MinionPro
@@ -115,10 +119,12 @@
 %------------------------------------------------
 \usepackage{siunitx}
 
+%------------------------------------------------
+\usepackage{tcolorbox}
 
-%----------------------------------------------------------------------------------------
+%------------------------------------------------
 %	FLOATS: TABLES, FIGURES AND CAPTIONS SETUP
-%----------------------------------------------------------------------------------------
+%------------------------------------------------
 
 \usepackage{tabularx} % Better tables
 \setlength{\extrarowheight}{3pt} % Increase table row height
@@ -128,9 +134,9 @@
 \captionsetup{format=hang,font=small}
 \usepackage{subfig}  
 
-%----------------------------------------------------------------------------------------
+%------------------------------------------------
 %	CODE LISTINGS SETUP
-%----------------------------------------------------------------------------------------
+%------------------------------------------------
 
 \usepackage{minted} % Syntax highlighting                                                                                                                                                                                                      
 \usemintedstyle{friendly}

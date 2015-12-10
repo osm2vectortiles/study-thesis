@@ -70,13 +70,14 @@ The layer definition consist of the id (layername), datasource, fields and the p
 
 
 \subsubsection{Buffers}\label{buffers}
-The buffer value on a layer defines how many pixels around each tile will be included. It is necessary to ensure correct rendering across tile boundaries. This value is individual for each layer and depends on the type of data. Buffers for layers containing labels should have a large buffer size such as 128 pixels, whereas a layer like landuse does only need a buffers size of 4 pixels. In general, the buffer size should be set to the minimum to keep the size of the vector tiles as low as possible.\footnote{\url{https://www.mapbox.com/help/source-manual/\#buffers}}\\
+The buffer value on a layer defines how many pixels around each tile will be included. It is necessary to ensure correct rendering across tile boundaries. This value is individual for each layer and depends on the type of data. Buffers for layers containing labels should have a large buffer size such as 128 pixels, whereas a layer like landuse does only need a buffers size of 4 pixels. In general, the buffer size should be set to the minimum to keep the size of the vector tiles as low as possible.\footnote{\url{https://www.mapbox.com/help/source-manual/\#buffers}}
 
 \begin{figure}[h]
   \centering
   \includegraphics[width=1\textwidth]{images/buffer.png}
   \caption{Example for buffer values}
 \end{figure}
+
 The figure above is a good example to see the result of the buffer value. We can see that there are rivers but no other data, therefore the rivers must have a larger buffer value than the other layers.
 
 \subsubsection{Overzooming}\label{overzooming}
@@ -122,14 +123,14 @@ waterway\_label &  &  &  &  &  &  &  &  & x & x & x & x & x & x & x \\
 housenum\_label &  &  &  &  &  &  &  &  &  &  &  &  &  &  & x
 \end{tabular}
 }
-\caption{Shows which feature class is included on which zoom level}
+\caption{Feature classes on different zoom levels}
 \label{my-label}
 \end{table}
 
 \section{Reverse Engineering Process}\label{reverse_engineering_process}
 One of the main requirements of this project was to make our vector tiles compatible with the Mapbox Streets vector tiles\footnote{\url{https://www.mapbox.com/developers/vector-tiles/mapbox-streets-v6/}}.
 \\
-We didn't define this requirement from the beginning, it just evolved during the construction of our first prototype.
+We didn't define this requirement from the beginning, it evolved during the construction of our first prototype.
 Therefore we spent a lot of time making our vector tiles as similar as possible to the ones of Mapbox.
 \\
 The sections below describe the tools and methods we used to achieve the goal of Mapbox Streets compatibility.
@@ -176,6 +177,29 @@ Mapbox Streets v6 vector tile(0/0/0):
   } 
 }
 \end{jsoncode}
+
+\section{Mapping}
+
+Imposm 3 requires a custom mapping file to decide which tags and geometries are mapped into which table.
+
+The example data mapping\footnote{\url{http://imposm.org/docs/imposm3/latest/mapping.html}} defines that geometries of type polygon with the key value pairs \texttt{natural=wood}, \texttt{natural=land} and \texttt{tourism=zoo} should be mappend into the \texttt{landusages} table.
+
+\begin{yamlcode}
+tables:
+   landusages:
+     type: polygon
+     mapping:
+       natural: [wood, land]
+       tourism: [zoo]
+\end{yamlcode}
+
+Instead of mapping all values of a certain key a explicit mapping strategy has been chosen. Each tag was explicitly defined in the mapping. This required mapping a lot of tags (to map all sport POIs over 79 tags are mapped) but has the benefit of knowing exactly which tags are in the database which makes querying and filtering easier.
+
+\begin{figure}[H]
+  \includegraphics[width=1\textwidth]{images/mapping_keys.png}
+  \caption{Mapping of tags to tables}
+\end{figure}
+
 
 
 \section{Database Schema}
@@ -300,7 +324,7 @@ The Vector Tile Compare tool analyzes vector tiles and outputs interesting infor
   \includegraphics[width=1\textwidth]{images/vector_tile_compare.png}
   \caption{Compare of Mapbox Streets v6 and Open Streets on 31.10.2015}
 \end{figure}
-\\
+
 This gave us a good indicator of which layers are shown on which zoom level and what attributes are contained in a layer.
 
 \subsubsection{Visual Compare}\label{visual_compare}
@@ -340,7 +364,7 @@ checkpoint_completion_target = 0.9
 wal_buffers = 16MB
 default_statistics_target = 500
 \end{bashcode}
-\\
+
 For speed up the import, we disabled transactional features of PostgreSQL. \footnote{\url{http://www.databasesoup.com/2015/02/running-with-scissors-mode.html}}.
 
 \begin{bashcode}
@@ -407,4 +431,3 @@ SELECT
                ORDER BY localrank_poi(type) ASC) AS localrank,
 FROM osm_poi
 \end{sqlcode}
-

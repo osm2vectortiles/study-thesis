@@ -5,10 +5,10 @@ The implementation is divided into the vector tile rendering process and the til
 \section{Vector Tile Rendering}
 
 \paragraph{Import}
-In the import phase data sources are imported into a spatial database and mapped to a database schema
+In the import phase data sources are imported into a spatial database and mapped to a database schema.
 
 \paragraph{Export}
-In the export phase a data style is applied to the database to produce vector tiles 
+In the export phase a data style is applied to the database to produce vector tiles.
 
 \paragraph{Data Style}
 \marginpar{The section \hyperref[data_style]{\emph{Data Style}} in part two provides more details.}The data style is a description of the vector tile structure and the SQL queries to fetch the data.
@@ -24,7 +24,7 @@ In the export phase a data style is applied to the database to produce vector ti
 To display the vector tiles a tile server and a visual style is needed. There are two possibilities, which are described in the following two sections.
 
 \paragraph{Visual Style}
-The visual style defines how a feature set such as landuse actually gets displayed. In the case of landuse on could define the texture or the color of the border and area.
+The visual style defines how a feature class such as landuse actually gets displayed. In the case of landuse on could define the texture or the color of the border and area.
 
 
 \subsection{Raster Tile Server}
@@ -40,7 +40,7 @@ The raster tile server makes it possible to display the vector tiles. It takes t
 
 \subsection{Vector Tile Server}
 
-The vector tile server in contrast to the raster tile variant directly serves the vector tiles to the client. The raster tiles are rendered on the client side using visual style(Mapbox GL Style\footnote{\url{https://www.mapbox.com/mapbox-gl-style-spec/}}). The advantage of this approach is more control over the user experience and that less server computing power is needed.
+The vector tile server in contrast to the raster tile variant directly serves the vector tiles to the client. The raster tiles are rendered on the client side using visual style. The advantage of this approach is more control over the user experience and that less server computing power is needed.
 
 \begin{figure}[h]
 

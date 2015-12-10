@@ -27,7 +27,7 @@
 %----------------------------------------------------------------------------------------
 
 \refstepcounter{dummy}
-\addcontentsline{toc}{chapter}{\listfigurename} % Uncomment if you would like the list of figures to appear in the table of contents
+
 %\pdfbookmark[1]{\listfigurename}{lof} % Bookmark name visible in a PDF viewer
 
 \listoffigures
@@ -40,11 +40,8 @@
 %----------------------------------------------------------------------------------------
 
 \refstepcounter{dummy}
-%\addcontentsline{toc}{chapter}{\listtablename} % Uncomment if you would like the list of tables to appear in the table of contents
-%\pdfbookmark[1]{\listtablename}{lot} % Bookmark name visible in a PDF viewer
-%
 \listoftables
-%        
+
 \vspace*{8ex}
 \newpage
     
@@ -66,17 +63,27 @@
 %----------------------------------------------------------------------------------------
 %	Acronyms
 %----------------------------------------------------------------------------------------
-
 \refstepcounter{dummy}
-\addcontentsline{toc}{chapter}{Acronyms} % Uncomment if you would like the acronyms to appear in the table of contents
-%\pdfbookmark[1]{Acronyms}{acronyms} % Bookmark name visible in a PDF viewer
-
 \markboth{\spacedlowsmallcaps{Acronyms}}{\spacedlowsmallcaps{Acronyms}}
-
 \chapter*{Acronyms}
 
-\begin{acronym}[UML]
+\begin{acronym}[Acronyms]
 \acro{OSM}{OpenStreetMap, free map}
+\acro{ETL}{Extract, Transform and Load}
 \end{acronym}  
-                   
+
+\newpage
+
+%----------------------------------------------------------------------------------------
+%	Glossary
+%----------------------------------------------------------------------------------------
+\refstepcounter{dummy}
+\markboth{\spacedlowsmallcaps{Glossary}}{\spacedlowsmallcaps{Glossary}}
+\chapter*{Glossary}
+
+\begin{acronym}[Glossary]
+\acro{Feature Class}{Group of features with the same geometry type and attributes}
+\acro{Layer}{Mapbox definition of a feature class}
+\end{acronym}  
+
 \endgroup

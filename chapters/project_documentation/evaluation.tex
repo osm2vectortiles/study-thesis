@@ -2,12 +2,17 @@
 
 \section{Spatial Database}\label{spatial_database}
 
-PostGIS was the only viable choice due to superbe tooling support. The OSM wiki\footnote{\url{http://wiki.openstreetmap.org/wiki/Databases_and_data_access_APIs\#Database_Schemas}} provides a very helpful article about which import tool or database should be selected for different use cases. For the use case rendering the only possibility they recommend is PostgresSQL with the PostGIS extension. 
+The OSM wiki\footnote{\url{http://wiki.openstreetmap.org/wiki/Databases_and_data_access_APIs\#Database_Schemas}} recommends PostgreSQL with the PostGIS extension for processing the data. There also exists a method\footnote{\url{https://github.com/systemed/tilemaker}} that circumvents using a database and directly transform OSM data into vector tiles but this does not scale for global vector tile coverage and does not support mixing additional data into the vector tiles.
+
+\begin{tcolorbox}
+\textbf{Decision} \\
+PostGIS was the only viable choice due to superb tooling support for OSM data and
+advanced spatial query capabilities.
+\end{tcolorbox}
 
 \section{OSM Import Tool}\label{osm_import_tool}
-The OSM community
-recommends\footnote{\url{http://wiki.openstreetmap.org/wiki/Databases_and_data_access_APIs}}
-PostgreSQL with the Postgis extension and imposm or osm2pgsql as import tool.
+As import tool the OSM community recommends imposm\footnote{\url{http://imposm.org/}} or osm2pgsql\footnote{\url{http://wiki.openstreetmap.org/wiki/Osm2pgsql}}.
+In this section the two tools are compared with each other.
 
 \subsection{Criterias}\label{criterias}
 
@@ -33,7 +38,7 @@ from other data style projects available.
 
 \subsection{Evaluation Matrix}\label{evaluation_matrix}
 
-\begin{center}
+\begin{table}[H]
     \begin{tabular}{llll}
     \hline
     Criteria         & Weight & imposm & osm2pgsql \\
@@ -45,12 +50,13 @@ from other data style projects available.
     \hline
     \textbf{Weighted Score} & 1      & 7      & 5,7       \\
     \end{tabular}
-\end{center}
+    \caption{Evaluation matrix of imposm vs osm2pgsql}
+\end{table}
 
 
 \subsection{osm2pgsql}\label{osm2pgsql_importer}
 
-osm2pgsql \footnote{\url{http://wiki.openstreetmap.org/wiki/Osm2pgsql}} is the
+osm2pgsql\footnote{\url{http://wiki.openstreetmap.org/wiki/Osm2pgsql}} is the
 most commonly used import tool for processing raw OpenStreetMap data into PostGIS.
 The import schema is also called osm2pgsql and defines a very
 simple schema(line, point, polygon and
@@ -60,7 +66,7 @@ indices. Osm2pgsql supports updating of the database, if the values have
 been stored as hstore. The schema can be adapted via the import style \footnote{\url{http://wiki.openstreetmap.org/wiki/Osm2pgsql\#Import_style}}
 but most projects use the default style\footnote{\url{https://github.com/openstreetmap/osm2pgsql/blob/master/default.style}} provided by osm2pgsql.
 
-\subsubsection{Imposm 3 }\label{imposm-importer}
+\subsubsection{imposm3}\label{imposm-importer}
 
 Imposm is an import tool for OSM data, it is not a schema. But it
 defines a default
@@ -70,15 +76,18 @@ advantage of the default schema is that it groups data thematically into
 tables. Which results in smaller tables and simpler queries. Imposm 3
 supports updating the database from OSM diff
 files\footnote{\url{http://imposm.org/docs/imposm3/latest/tutorial.html\#diff}}
-
-\paragraph{Decision} For our use case it is important, that the import is efficent and that
+ 
+\begin{tcolorbox}
+\textbf{Decision} \\
+For our use case it is important, that the import is efficent and that
 the import tool supports updating based on OSM diff files. Imposm 3 is
 faster than osm2pgsql and supports updatability. So we decided to take
 imposm for importing.
+\end{tcolorbox}
 
 \section{Vector Tile Format}\label{vector-tile-formats}
 
-Vector tiles is quite a broad term. If we talk about vector tiles in thesis we usually mean Mapbox vector tiles which is just a custom open specification how vector tiles should be structured.
+Vector tiles is quite a broad term. If we talk about vector tiles in thesis we usually mean Mapbox vector tiles which is a custom open specification how vector tiles should be structured.
 
 \paragraph{Mapbox Vector Tiles}
 
@@ -104,26 +113,35 @@ Google Maps is using vector tiles since 2010 under the hood and was the
 first provider implementing this. Styling is limited and the format
 proprietary.
 
-\paragraph{Decision} Because one of the main requirements of this project was to provide Mapbox Streets compatible vector tiles and Mapbox provides very good tools to handle vector tiles, we had almost no other choice than going with Mapbox's implementation of vector tiles.
+\begin{tcolorbox}
+\textbf{Decision} \\
+Because one of the main requirements of this project was to provide Mapbox Streets compatible vector tiles and Mapbox provides very good tools to handle vector tiles, we had almost no other choice than going with Mapbox's implementation of vector tiles.
+\end{tcolorbox}
 
 \section{Vector Tile Server}\label{vector_tile_server}
 
-Next to the vector tiles for Switzerland, the second deliverable is a basic vector tile server. So that even a non technical person can get started quickly with our vector tiles.\\
-When we did some research on open source projects of vector tile servers, we found out that most of the people build their tile server set-up specifically for their use case. So there wasn't a typical solution present like Postgres is for the spatial databases.
+Next to the vector tiles for Switzerland, the second deliverable is a basic vector tile server. The goal is that a non technical person can get started quickly with the custom vector tiles.\\
+
+Unlike the choice for a spatial database or OSM import tool
+there is no typical setup method of a raster tile server using vector tiles under the hood. Most people in the Open Source community build their own specific tile server setup.
 
 \subsection{Tessera}\label{tessera}
 
-Tessera is basically a Node.js webserver, which uses Mapbox's tilelive\footnote{\url{https://github.com/mapbox/tilelive}} modules to read vector tiles and generates raster tiles of it.
+Tessera\footnote{\url{https://github.com/mojodna/tessera}} is a Node.js\footnote{\url{https://nodejs.org/en/}} webserver, which s using Mapbox tilelive\footnote{\url{https://github.com/mapbox/tilelive}} modules to read vector tiles and generates raster tiles.
+
 \begin{figure}[H]
   \includegraphics[scale=0.6]{images/tessera_node_bindings.png}
   \caption{Architecture Diagramm Tessera}
-\end{figure}\\
-We did load tests to get some metrics on how the server is performing.
+\end{figure}
+
+Load tests were performed to measure server performance with tessera.
 \\
-Infrastructure: AWS EC2 t2.micro instance(1 GB Memory / 1 Core)
-Task: Zooming in from zoom level 10 to 22
-Conditions: 50 concurrent users
-Results:
+\textbf{Infrastructure}: AWS EC2 t2.micro instance(1 GB Memory / 1 Core)
+\textbf{Task}: Zooming in from zoom level 10 to 22 \\
+\textbf{Conditions}: 50 concurrent users \\
+
+A sample result of the load test is shown below.
+
 \begin{bashcode}
 ---- Global Information --------------------------------------------------------
 > request count                                      10350 (OK=10348  KO=2     )
@@ -142,18 +160,24 @@ Results:
 ---- Errors --------------------------------------------------------------------
 > java.util.concurrent.TimeoutException: Request timed out to ec      2 (100.0%)
 2-52-30-184-45.eu-west-1.compute.amazonaws.com/52.30.184.45:80...
-\end{bashcode} \\
+\end{bashcode}
 
 With 50 concurrent users tessera was still able to respond to all requests in less than 1200 ms.
 
-\subsection{OpenStreetMap "Standard" tile server}\label{osm_standard_tile_server}
-Our adviser Petr Pridal recommended to reimplement the OSM standard raster tile server for the use of vector tiles. The OSM standard raster tile server consists of Apache as webserver and a custom Apache module called mod\_tile\footnote{\url{http://wiki.openstreetmap.org/wiki/Mod_tile}} for the rendering of raster tiles. This is a proven set-up as it is in production since years, but it was designed a long time ago when nobody though about vector tiles.
+\subsection{OpenStreetMap "Standard" Tile Server}\label{osm_standard_tile_server}
+
+A proven set up for generating raster tiles directly from PostgreSQL with Mapnik consists of an Apache webserver and a custom Apache module mod\_tile\footnote{\url{http://wiki.openstreetmap.org/wiki/Mod_tile}}. This approach was around before vector tiles were proposed.
+
 \begin{figure}[H]
   \includegraphics[scale=0.6]{images/mod_tile.png}
   \caption{Architecture Diagramm OSM Standard tile server}
-\end{figure} \\
-Petr Pridals proposal was instead of having a geospatial database as datasource like the "old" raster tile server, switching the datasource to vector tiles. The task would have been to implement a custom Apache module which reads the vector tiles, renders them with mapnik and provides them to the apache webserver.
+\end{figure}
 
-\subsection{Decision}\label{tile_server_decision}
-The plan was to perform the load test on each version of the vector tile server and then make the decision based on the results. Due to the fact, that the test results of tessera where good enough for our use case and we didn't have to implement a lot, we decided to take tessera as vector tile server.
+It is theoretically possible to implement a raster tile server
+on top of Mapnik and renderd using C++. Instead of using a spatial database as source for the rendered raster tiles a datasource binding would need to be implemented to read the vector tiles and hand them over to the Mapnik renderer. 
+
+\begin{tcolorbox}\label{tile_server_decision}
+\textbf{Decision} \\
+The plan was to perform the load test on each version of the vector tile server and then make the decision based on the results. Due to the fact, that the test results of tessera where good enough for the thesis use case and it didn't take much time to implement, we decided to use tessera as raster tile server.
 If somebody needs a high-performance tile server, one should probably think about the second variant.
+\end{tcolorbox}
