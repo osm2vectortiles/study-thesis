@@ -8,38 +8,31 @@
 \chapter*{Management Summary}
 \label{management-summary}
 
-This is necessary to show the added value of our project and help the understanding.
+\subsection*{Situation}\label{introduction}
 
-%--------------------------------------------------------
+Web mapping has gone through different technological changes in recent years. 
+After serving static images for an extract of the map, Google introduced raster tile based maps with Google Maps and it soon became the standard for web maps.\\
+Now the major players have shifted to using vector tiles. Vector tiles allow map designers to individually design their own map. The system administrator does not need to manage large infrastructure, as the tile rendering process can be offloaded to the client side. This results in faster maps with a better user experience.
+\begin{figure}[H]
+  \includegraphics[width=1\textwidth]{images/custom_map.png}
+  \caption{Custom styling of maps in Mapbox Studio}
+\end{figure}
+A few existing providers opened the process of creating vector tiles, but still own the data to promote their services. Producing vector tiles requires a good understanding of map technologies and sufficient computing power. This is the reason, why vector tiles aren't adopted by the main stream yet.
 
+\subsection*{Approach}
 
-\subsection*{Introduction}\label{introduction}
+The main objective of this project is to create free and open-source vector tiles of Open Street Map data. So that every developer, cartographer or designer can create their custom maps.\\ 
+An entire workflow for producing vector tiles was defined and a vector tile server to serve the produced vector tiles was implemented. The vector tiles are compatible with the vector tiles of Mapbox Streets, therefore the same visual style provided by Mapbox can be used with our vector tiles. The figure below shows the Mapbox Artistic Woodcut visual style, which can be used with our vector tiles as data source.
 
-Creating a custom styled OSM map is one of the most common use cases
-among cartographers yet it is very difficult to do so. With the new
-emerging technology of vector tiles it is possible to allow anyone to
-create their custom OSM maps without downloading the entire database and
-managing complex infrastructure. The task of this project is to make
-this as easy as possible.
+\begin{figure}[H]
+  \includegraphics[width=1\textwidth]{images/woodcut.png}
+  \caption{Mapbox's Artistic Woodcut visual style}
+\end{figure}
 
-\subsection*{Approach / Technologies}
-
-Our project is focused on creating a free and Open Source vector tiles
-of Open Street Map that can easily used by developers, cartographers and
-designers to create their custom maps.
-\newline{}
-Through the use of Docker we can provide workflows that don't need a
-complicate setup and are deployable across operating systems.
 
 \subsection*{Result}
+The result of this thesis are vector tiles of Switzerland. They are available for download from the project website(\url{http://osm2vectortiles.org}). These vector tiles can be served together with a custom or Mapbox visual style in our vector tile server.\\
+As the entire workflow of creating vector tiles is documented and open-source available, other organizations could now use this project to produce vector tiles of their own datasets.
+\endgroup
 
-\begin{itemize}
-\item
-  Docker Container to create vector tiles (MBTiles with PBF) from OSM
-\item
-  Docker Container to serve vector tiles together with custom styles as
-  raster data
-\end{itemize}
-
-\endgroup			
 \vfill
