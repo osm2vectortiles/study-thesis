@@ -17,7 +17,7 @@
 % Available options: drafting parts nochapters linedheaders eulerchapternumbers beramono eulermath pdfspacing minionprospacing tocaligned dottedtoc manychapters listings floatperchapter subfig
 % Adding 'dottedtoc' will make page numbers in the table of contents flushed right with dots leading to them
 
-\newcommand{\myTitle}{OpenStreetMap Easy Custom Styling\xspace}
+\newcommand{\myTitle}{Vector Tiles from OpenStreetMap\xspace}
 \newcommand{\mySubtitle}{Free Vector Tiles from OpenStreetMap data\xspace}
 \newcommand{\myThesis}{Student Research Project Thesis\xspace}
 \newcommand{\myName}{Lukas Martinelli, Manuel Roth\xspace}
@@ -229,11 +229,11 @@ pdfproducer={LaTeX with hyperref and classicthesis}
 \fi}
 }{\relax} 
 
-%----------------------------------------------------------------------------------------
+%-------------------------------------
 %	AUTOREFERENCES SETUP
 %	Redefines how references in text are prefaced for different 
 %	languages (e.g. "Section 1.2" or "section 1.2")
-%----------------------------------------------------------------------------------------
+%-------------------------------------
 
 \makeatletter
 \@ifpackageloaded{babel}
@@ -261,22 +261,22 @@ pdfproducer={LaTeX with hyperref and classicthesis}
 }{\relax}
 \makeatother
 
-%----------------------------------------------------------------------------------------
+%-------------------------------------
 
 \usepackage{classicthesis} 
 
-%----------------------------------------------------------------------------------------
+%-------------------------------------
 %	CHANGING TEXT AREA 
-%----------------------------------------------------------------------------------------
+%-------------------------------------
 
 %\linespread{1.05} % a bit more for Palatino
 %\areaset[current]{312pt}{761pt} % 686 (factor 2.2) + 33 head + 42 head \the\footskip
-%\setlength{\marginparwidth}{7em}%
-%\setlength{\marginparsep}{2em}%
+\setlength{\marginparwidth}{0em}%
+\setlength{\marginparsep}{0em}%
 
-%----------------------------------------------------------------------------------------
+%-------------------------------------
 %	USING DIFFERENT FONTS
-%----------------------------------------------------------------------------------------
+%-------------------------------------
 
 %\usepackage[oldstylenums]{kpfonts} % oldstyle notextcomp
 %\usepackage[osf]{libertine}
