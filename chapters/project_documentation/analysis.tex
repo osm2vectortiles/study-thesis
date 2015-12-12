@@ -16,6 +16,7 @@ The infrastructure package contains specially configured programs as Docker imag
 It contains a PostGIS database, a connection pooler (pgbouncer) and a tessera based raster tile server.
 
 \begin{figure}[H]
+\centering
   \includegraphics[scale=0.6]{images/high_level_packages.png}
   \caption{High level package diagram}
 \end{figure}
@@ -45,6 +46,7 @@ Water polygons from OpenStreetMapData.
 Custom curated labels for marine, countries and states.
 
 \begin{figure}[H]
+\centering
   \includegraphics[scale=0.6]{images/import_export_package_diagram.png}
   \caption{Import package}
 \end{figure}
@@ -87,6 +89,7 @@ Load testing with Gatling for tileserver implementation.
 Mapbox studio in a Docker container for working on a server.
 
 \begin{figure}[H]
+\centering
   \includegraphics[scale=0.6]{images/tooling_package_diagram.png}
   \caption{Tooling package}
 \end{figure}
@@ -113,6 +116,7 @@ The data container pattern\footnote{\url{http://container42.com/2013/12/16/persi
 The data only containers are mounted from \texttt{import-osm} for storing cache data while importing and in \texttt{postgis} for storing the database files.
 
 \begin{figure}[H]
+\centering
   \includegraphics[scale=0.6]{images/deployment_diagram_import.png}
   \caption{Import deployment diagram}
 \end{figure}
@@ -129,6 +133,7 @@ The data only containers are mounted from \texttt{import-osm} for storing cache 
 \end{itemize}
 
 \begin{figure}[H]
+\centering
   \includegraphics[scale=0.6]{images/deployment_dev_export.png}
   \caption{Export and development tools deployment diagram}
 \end{figure}
@@ -149,6 +154,7 @@ The import workflow is a view under the hood of the different components.
 \end{itemize}
 
 \begin{figure}[H]
+\centering
   \includegraphics[scale=0.6]{images/import_package_flow.png}
   \caption{Import workflow from various data sources into PostGIS}
 \end{figure}
@@ -158,12 +164,13 @@ The import workflow is a view under the hood of the different components.
 
 For generating the vector tiles the tilelive tool \texttt{tl} \footnote{\url{https://github.com/mojodna/tl}} is used which wraps
 around Mapnik. 
-\marginpar{\nameref{data_style} is a Mapbox Studio source project.}
+%\marginpar{\nameref{data_style} is a Mapbox Studio source project.}
 The data style defines all feature sets (layers) and is transformed into a Mapnik XML stylesheet by the \\
 \texttt{tilelive-tm2source} provider.
 \texttt{tilelive-bridge} calls Mapnik with the generated stylesheets and hands the generated data over to \texttt{node-mbtiles} which stores the vector tiles in a MBTiles container.
 
 \begin{figure}[H]
+\centering
   \includegraphics[scale=0.6]{images/export_package_flow.png}
   \caption{Export data from PostGIS to MBTiles}
 \end{figure}
@@ -176,7 +183,7 @@ The schema is flat and has no relations. Each table contains information about i
 \subsection{OpenStreetMap Planet}
 
 The cornerstone of the entire map is \osm{} data from published snapshots from OSM Planet\footnote{\url{http://planet.osm.org/}}.
-\marginpar{The OSM data is perfect for high zoom levels where detailed coverage of local areas is important.}
+%\marginpar{The OSM data is perfect for high zoom levels where detailed coverage of local areas is important.}
 Smaller extracts for single countries and continents are available from Geofabrik\footnote{\url{http://download.geofabrik.de/}}.
 For  single cities or regions the Metro extracts from Mapzen\footnote{\url{https://mapzen.com/data/metro-extracts/}} can be used.
 \\
@@ -189,6 +196,7 @@ Because imposm3 cannot match two types of polygons (e.g. polygon and point) we n
 to create a table for each geometry type.
 
 \begin{table}[H]
+\centering
     \begin{tabular}{lll}
     \hline
     Table Name            & Geometry Type & Description \\
@@ -214,12 +222,11 @@ to create a table for each geometry type.
 
 \subsection{Custom Curated Labels}
 
-The placement and importance of labels of countries, states and oceans matters\footnote{\url{https://axismaps.github.io/thematic-cartography/articles/labeling.html}} and is important to get right. Data from the overpass API \footnote{\url{https://wiki.openstreetmap.org/wiki/Overpass_API}} is converted into GeoJSON and
-manually edited and enhanced with a label rank.
-
-TODO: Now that it is done adapt the text
+The placement and importance of labels of countries, states and seas matters\footnote{\url{https://axismaps.github.io/thematic-cartography/articles/labeling.html}} and is important to get right. Data from the overpass API \footnote{\url{https://wiki.openstreetmap.org/wiki/Overpass_API}} is converted into GeoJSON and
+manually edited and enhanced with a label rank. For sea labels custom lines have been drawn to place the label along this line.
 
 \begin{table}[H]
+\centering
     \begin{tabular}{lll}
     \hline
     Table Name   & Geometry Type & Description \\
@@ -244,6 +251,7 @@ work well together with other \osm{} data and splits big water polygons into mul
 pieces for performance.
 
 \begin{table}[H]
+\centering
     \begin{tabular}{lll}
     \hline
     Table Name            & Geometry Type & Description \\
@@ -273,6 +281,7 @@ We use the following data from Natural Earth:
 
 
 \begin{table}[H]
+\centering
     \begin{tabular}{ll}
     \hline
     Table Name                                          & Geometry Type \\
@@ -297,6 +306,7 @@ We use the following data from Natural Earth:
 The layer schema tries to stay compliant to the Mapbox Streets v6 layer reference \footnote{\url{https://www.mapbox.com/developers/vector-tiles/mapbox-streets-v6/}} and Mapbox Streets v5 layer reference\footnote{\url{https://www.mapbox.com/developers/vector-tiles/mapbox-streets-v5/}}. The detailed documentation on which database tables are mapped to which feature classes, can be found in the following sections.
 
 \begin{table}[H]
+\centering
     \begin{tabular}{ll}
     \hline
      Layer             & Description                     \\
@@ -327,13 +337,12 @@ The layer schema tries to stay compliant to the Mapbox Streets v6 layer referenc
 \newpage
 \subsection{Aeroways, Barriers and Landusages}
 
-For a lot of layers linestring and polygon data needs to be converted into
-linestrings for the feature class.
-
-TODO: Explain problem bit more
+For some layers linestring and polygon data needs to be mapped into tables.
+The different geometries are then both rendered as vector linestrings.
+The landing strips of airports for example might be a linestring or polygon.
 
 \begin{figure}[H]
-  \centering
+\centering
   \includegraphics[scale=0.6]{images/aero_barrier_landusage_layer.png}
   \caption{Layers for aeroways, barriers and landusages}
 \end{figure}
@@ -341,6 +350,10 @@ TODO: Explain problem bit more
 \newpage
 \subsection{Administrative Borders}
 The administrative area on lower zoom levels is entirely from Natural Earth data.
+Only at higher zoom levels where details are more important the OSM borders are rendered.
+
+The Natural Earth data is in different resolutions and for different zoom levels different
+resolutions are used.
 
 \begin{figure}[H]
   \centering
@@ -353,7 +366,7 @@ The administrative area on lower zoom levels is entirely from Natural Earth data
 Roads are split up into normal roads, tunnels and bridges after a certain zoom level. \texttt{z\_order} and \texttt{layer} attributes are used to order the geometries on the right z axis.
 
 \begin{figure}[H]
-  \centering
+\centering
   \includegraphics[scale=0.6]{images/road_layer.png}
   \caption{Layers for roads, tunnels and bridges}
 \end{figure}
@@ -366,6 +379,7 @@ The \texttt{localrank} and \texttt{scalerank} of the \texttt{\#poi\_label} layer
 The \texttt{address} field is pulled together from the various address attributes on the tables (\texttt{street}, \texttt{housenumber}, \texttt{place}, \texttt{city}, \texttt{postcode} and \texttt{country}).
 
 \begin{figure}[H]
+\centering
   \includegraphics[scale=0.6]{images/poi_layer.png}
   \caption{Point of interest label layer}
 \end{figure}
@@ -376,6 +390,7 @@ Water bodies for lower zoom levels are taken from Natural Earth
 data while lakes and rivers are from \osm{}.
 
 \begin{figure}[H]
+\centering
   \includegraphics[scale=0.6]{images/water_layer.png}
   \caption{Water bodies and river layers}
 \end{figure}
@@ -386,6 +401,7 @@ The original \osm{} place data is enriched with scalerank data
 from Natural Earth.
 
 \begin{figure}[H]
+\centering
   \includegraphics[scale=0.6]{images/place_layer.png}
   \caption{Place label layer}
 \end{figure}

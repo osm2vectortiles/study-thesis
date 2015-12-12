@@ -1,7 +1,7 @@
 \chapter{Implementation}\label{implementation}
 
 The most promising vector tile specification was proposed by Mapbox.
-\marginpar{The Mapbox Vector Tile Specification is compared with other vector tile formats in chapter \ref{vector-tile-formats}}
+%\marginpar{The Mapbox Vector Tile Specification is compared with other vector tile formats in chapter \ref{vector-tile-formats}}
 They provide many open source tools to manage vector tiles. We tried not to implement tools which already exists and instead use as many existing tools as possible. Because of this our implementation consists mostly of docker containers which do a specific task.
 
 \section{Mapping}
@@ -22,6 +22,7 @@ tables:
 Instead of mapping all values of a certain key a explicit mapping strategy has been chosen. Each tag was explicitly defined in the mapping. This required mapping a lot of tags (to map all sport POIs over 79 tags are mapped) but has the benefit of knowing exactly which tags are in the database which makes querying and filtering easier.
 
 \begin{figure}[H]
+\centering
   \includegraphics[width=1\textwidth]{images/mapping_keys.png}
   \caption{Mapping of tags to tables}
 \end{figure}
@@ -40,7 +41,8 @@ to trace back the data and be able to query a distinct \osm{} feature in a visua
 All features which are label layers will contain several translations.
 The translations are directly mapped from the suffixed language code \footnote{\url{https://wiki.openstreetmap.org/wiki/Key:name}}. If a field is not available in the language, the local name is used.
 
-\begin{flushleft}
+\begin{table}[H]
+\centering
     \begin{tabular}{ll}
     \hline
      Field    & 	Description                                    \\
@@ -53,7 +55,8 @@ The translations are directly mapped from the suffixed language code \footnote{\
     name\_ru	 & Russian                          \\
     name\_zh	 & Chinese                          \\
     \end{tabular}
-\end{flushleft}
+    \caption{Translations of name field}
+\end{table}
 
 \subsection{Type and Class}
 The class can be explained as a feature class. It is a categorization of an OSM value.
@@ -69,19 +72,21 @@ and there is no standard. This is why we have done it by hand.
 A map designer that wants to style agricultural areas does not care
 what type of field it is.
 
-\begin{flushleft}
-\begin{tabular}{llll}
-Key      & Value      & Class       & Type           \\
-\hline
-landuse  & farm       & agriculture & orchard        \\
-building & farm       & agriculture & farm           \\
-landuse  & farmland   & agriculture & farmland       \\
-landuse  & farmyard   & agriculture & farmyard       \\
-landuse  & allotments & agriculture & allotments     \\
-landuse  & vineyard   & agriculture & vineyard       \\
-landuse  & vineyard   & agriculture & plant\_nursery
-\end{tabular}
-\end{flushleft}
+\begin{table}[H]
+\centering
+    \begin{tabular}{llll}
+    Key      & Value      & Class       & Type           \\
+    \hline
+    landuse  & farm       & agriculture & orchard        \\
+    building & farm       & agriculture & farm           \\
+    landuse  & farmland   & agriculture & farmland       \\
+    landuse  & farmyard   & agriculture & farmyard       \\
+    landuse  & allotments & agriculture & allotments     \\
+    landuse  & vineyard   & agriculture & vineyard       \\
+    landuse  & vineyard   & agriculture & plant\_nursery
+    \end{tabular}
+    \caption{Classification of landuse feature class}
+\end{table}
 
 \subsection{Classification Format}
 
@@ -258,8 +263,8 @@ The center attribute defines the default position of the map when the data style
 \subsection{Layer Definition}\label{layer_definition}
 A layer definition describes a view on the data. It can consist of multiple data sources. In the figure below the layer is a view and the definition of this view is a graphic definition.
 
-\begin{figure}[h]
-  \centering
+\begin{figure}[H]
+\centering
   \includegraphics[width=1\textwidth]{images/graphic_definition.png}
   \caption{General graphic definition}
 \end{figure}
@@ -296,7 +301,7 @@ The layer definition consist of the id (layername), datasource, fields and the p
 \subsubsection{Buffers}\label{buffers}
 The buffer value on a layer defines how many pixels around each tile will be included. It is necessary to ensure correct rendering across tile boundaries. This value is individual for each layer and depends on the type of data. Buffers for layers containing labels should have a large buffer size such as 128 pixels, whereas a layer like landuse does only need a buffers size of 4 pixels. In general, the buffer size should be set to the minimum to keep the size of the vector tiles as low as possible.\footnote{\url{https://www.mapbox.com/help/source-manual/\#buffers}}
 
-\begin{figure}[h]
+\begin{figure}[H]
   \centering
   \includegraphics[width=1\textwidth]{images/buffer.png}
   \caption{Example for buffer values}
@@ -420,7 +425,7 @@ This gave us a good indicator of which layers are shown on which zoom level and 
 The vector tile comparison was good to ensure that we have exactly the same data on the same zoom level. But when we started to visually compare our map with the map of Mapbox Streets, we still saw big differences. So we decided to build a visual compare tool. 
 
 \begin{figure}[H]
-  \centering
+\centering
   \includegraphics[width=1\textwidth]{images/visual_compare.png}
   \caption{Visual Compare of Mapbox Streets and Open Streets}
 \end{figure}

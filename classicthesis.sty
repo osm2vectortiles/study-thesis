@@ -373,7 +373,7 @@
         {\titlerule\vspace*{.9\baselineskip}\raggedright\spacedallcaps}[\normalsize\vspace*{.8\baselineskip}\titlerule]%
     }{% something like Bringhurst  
     \titleformat{\chapter}[display]%
-        {\relax}{\mbox{}\oldmarginpar{\vspace*{-3\baselineskip}\color{OsmGreenLight}\chapterNumber\thechapter}}{0pt}%
+        {\relax}{\vspace*{-3\baselineskip}\makebox[\linewidth][r]{\color{OsmGreenLight}\chapterNumber\thechapter}}{0pt}%
         {\raggedright\spacedallcaps}[\normalsize\vspace*{.8\baselineskip}\titlerule]% 
     }
     % sections \FloatBarrier

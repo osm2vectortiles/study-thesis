@@ -39,6 +39,7 @@ from other data style projects available.
 \subsection{Evaluation Matrix}\label{evaluation_matrix}
 
 \begin{table}[H]
+\centering
     \begin{tabular}{llll}
     \hline
     Criteria         & Weight & imposm & osm2pgsql \\
@@ -130,6 +131,7 @@ there is no typical setup method of a raster tile server using vector tiles unde
 Tessera\footnote{\url{https://github.com/mojodna/tessera}} is a Node.js\footnote{\url{https://nodejs.org/en/}} webserver, which s using Mapbox tilelive\footnote{\url{https://github.com/mapbox/tilelive}} modules to read vector tiles and generates raster tiles.
 
 \begin{figure}[H]
+\centering
   \includegraphics[scale=0.6]{images/tessera_node_bindings.png}
   \caption{Architecture Diagramm Tessera}
 \end{figure}
@@ -169,6 +171,7 @@ With 50 concurrent users tessera was still able to respond to all requests in le
 A proven set up for generating raster tiles directly from PostgreSQL with Mapnik consists of an Apache webserver and a custom Apache module mod\_tile\footnote{\url{http://wiki.openstreetmap.org/wiki/Mod_tile}}. This approach was around before vector tiles were proposed.
 
 \begin{figure}[H]
+\centering
   \includegraphics[scale=0.6]{images/mod_tile.png}
   \caption{Architecture Diagramm OSM Standard tile server}
 \end{figure}

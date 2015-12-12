@@ -175,12 +175,10 @@
 %----------------------------------------------------------------------------------------
 %	HYPERREFERENCES
 %----------------------------------------------------------------------------------------
-
 \PassOptionsToPackage{pdftex,hyperfootnotes=false,pdfpagelabels}{hyperref}
 \usepackage{hyperref}  % backref linktocpage pagebackref
 \pdfcompresslevel=9
 \pdfadjustspacing=1
-
 \hypersetup{
 % Uncomment the line below to remove all links (to references, figures, tables, etc)
 %draft, 
@@ -266,13 +264,19 @@ pdfproducer={LaTeX with hyperref and classicthesis}
 \usepackage{classicthesis} 
 
 %-------------------------------------
+%	MARGINS
+%-------------------------------------
+\usepackage[left=2.5cm,right=3.2cm,top=2.5cm,bottom=3cm]{geometry}
+
+%-------------------------------------
 %	CHANGING TEXT AREA 
 %-------------------------------------
 
 %\linespread{1.05} % a bit more for Palatino
 %\areaset[current]{312pt}{761pt} % 686 (factor 2.2) + 33 head + 42 head \the\footskip
-\setlength{\marginparwidth}{0em}%
-\setlength{\marginparsep}{0em}%
+\setlength{\marginparwidth}{0pt}
+\setlength{\marginparsep}{0pt}
+
 
 %-------------------------------------
 %	USING DIFFERENT FONTS
