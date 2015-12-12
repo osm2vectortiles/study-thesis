@@ -363,7 +363,7 @@ resolutions are used.
 
 \newpage
 \subsection{Roads, Bridges and Tunnels}
-Roads are split up into normal roads, tunnels and bridges after a certain zoom level. \texttt{z\_order} and \texttt{layer} attributes are used to order the geometries on the right z axis.
+Roads are split up into normal roads, tunnels and bridges after a certain zoom level. \texttt{z\_order} and \texttt{layer} attributes are used to order the geometries on the right z axis. Road labels however will always contain data for tunnels, bridges and normal roads therefore one table that is filtered into different views at higher zoom levels is the best approach.
 
 \begin{figure}[H]
 \centering
@@ -388,6 +388,7 @@ The \texttt{address} field is pulled together from the various address attribute
 \subsection{Water}
 Water bodies for lower zoom levels are taken from Natural Earth
 data while lakes and rivers are from \osm{}.
+Big rivers often consist out of a water polygons while smaller rivers are only water ways.
 
 \begin{figure}[H]
 \centering
@@ -397,8 +398,11 @@ data while lakes and rivers are from \osm{}.
 
 \newpage
 \subsection{Places}
-The original \osm{} place data is enriched with scalerank data
-from Natural Earth.
+
+Places are names of cities and villages. To calculate the importance of a city
+the scalerank of the most important cities from Natural Earth data is merged into the
+\osm{} data set. For places that do not have a scalerank value a dynamic value is calculated
+based on the population.
 
 \begin{figure}[H]
 \centering

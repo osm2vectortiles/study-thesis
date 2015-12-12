@@ -4,8 +4,8 @@
 
 The OSM wiki\footnote{\url{http://wiki.openstreetmap.org/wiki/Databases_and_data_access_APIs\#Database_Schemas}} recommends PostgreSQL with the PostGIS extension for processing the data. There also exists a method\footnote{\url{https://github.com/systemed/tilemaker}} that circumvents using a database and directly transform OSM data into vector tiles but this does not scale for global vector tile coverage and does not support mixing additional data into the vector tiles.
 
-\begin{tcolorbox}
-\textbf{Decision} \\
+\\
+\begin{tcolorbox}[arc=0mm,boxrule=1pt,title=Decision]\label{spatial_db_decision}
 PostGIS was the only viable choice due to superb tooling support for OSM data and
 advanced spatial query capabilities.
 \end{tcolorbox}
@@ -77,9 +77,9 @@ advantage of the default schema is that it groups data thematically into
 tables. Which results in smaller tables and simpler queries. Imposm 3
 supports updating the database from OSM diff
 files\footnote{\url{http://imposm.org/docs/imposm3/latest/tutorial.html\#diff}}
- 
-\begin{tcolorbox}
-\textbf{Decision} \\
+
+\\ 
+\begin{tcolorbox}[arc=0mm,boxrule=1pt,title=Decision]\label{osm_import_tool_decision}
 For our use case it is important, that the import is efficent and that
 the import tool supports updating based on OSM diff files. Imposm 3 is
 faster than osm2pgsql and supports updatability. So we decided to take
@@ -114,8 +114,8 @@ Google Maps is using vector tiles since 2010 under the hood and was the
 first provider implementing this. Styling is limited and the format
 proprietary.
 
-\begin{tcolorbox}
-\textbf{Decision} \\
+\\
+\begin{tcolorbox}[arc=0mm,boxrule=1pt,title=Decision]\label{vector_tile_spec_impl_decision}
 Because one of the main requirements of this project was to provide Mapbox Streets compatible vector tiles and Mapbox provides very good tools to handle vector tiles, we had almost no other choice than going with Mapbox's implementation of vector tiles.
 \end{tcolorbox}
 
@@ -179,8 +179,8 @@ A proven set up for generating raster tiles directly from PostgreSQL with Mapnik
 It is theoretically possible to implement a raster tile server
 on top of Mapnik and renderd using C++. Instead of using a spatial database as source for the rendered raster tiles a datasource binding would need to be implemented to read the vector tiles and hand them over to the Mapnik renderer. 
 
-\begin{tcolorbox}\label{tile_server_decision}
-\textbf{Decision} \\
+\\
+\begin{tcolorbox}[arc=0mm,boxrule=1pt,title=Decision]\label{tile_server_decision}
 The plan was to perform the load test on each version of the vector tile server and then make the decision based on the results. Due to the fact, that the test results of tessera where good enough for the thesis use case and it didn't take much time to implement, we decided to use tessera as raster tile server.
 If somebody needs a high-performance tile server, one should probably think about the second variant.
 \end{tcolorbox}
