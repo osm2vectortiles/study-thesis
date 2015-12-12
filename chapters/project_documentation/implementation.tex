@@ -2,7 +2,9 @@
 
 The most promising vector tile specification was proposed by Mapbox.
 %\marginpar{The Mapbox Vector Tile Specification is compared with other vector tile formats in chapter \ref{vector-tile-formats}}
-They provide many open source tools to manage vector tiles. We tried not to implement tools which already exists and instead use as many existing tools as possible. Because of this our implementation consists mostly of docker containers which do a specific task.
+They provide many open source tools to manage vector tiles. Instead of implementing existing tools and approaches as many existing tools
+as possible were used to speed up development.
+Because of this the implementation consists mostly of docker containers which do a specific task.
 
 \section{Mapping}
 
@@ -67,7 +69,7 @@ The type is the OSM value of the feature.
 
 The OpenStreetMap tagging schema has developed into a complex taxonomy of real-world feature classes and objects. \cite[p. 15]{haklay2008openstreetmap}. Map designers don't want to design
 for each distinct object specifically which is why Mapbox and others abstract distinct key value pairs into so called feature classes. Mapbox calls those feature class simply class. Mapping created key value pairs into categories, cannot be automated
-and there is no standard. This is why we have done it by hand.
+and there is no standard. This is why this is done by hand.
 \\
 A map designer that wants to style agricultural areas does not care
 what type of field it is.
@@ -90,8 +92,9 @@ what type of field it is.
 
 \subsection{Classification Format}
 
-We created the classifications in a YAML based format.
-Where each key in \texttt{classifications} denotes the classification name. The elements within each classification (e.g. \texttt{driveway} or \texttt{main} are the class name and the values below the class name (e.g. \texttt{primary}, \texttt{primary\_link} the OSM values to match. We do not explicitly match the OSM keys as well - only the values.
+The classicifcations are written in a YAML based format.
+Where each key in \texttt{classifications} denotes the classification name. The elements within each classification (e.g. \texttt{driveway} or \texttt{main} are the class name and the values below the class name (e.g. \texttt{primary}, \texttt{primary\_link} the OSM values to match.
+The OSM keys are not matched explicitly - only the values.
 
 \begin{yamlcode}
 classifications:
@@ -113,8 +116,9 @@ classifications:
 
 \subsection{Code Generation}
 
-We take the readable classification format and generate immutable SQL
-functions which we can use in our queries.
+The readable classification format is taken and immutable SQL functions are generated
+from the YAML source. These functions can then be used in the layer queres.
+
 The example above will result in the following function.
 
 \begin{sqlcode}
@@ -153,8 +157,8 @@ important a label is compared to the labels in its neighbourhood.
 
 \subsubsection{Order Features by their Types}
 
-In the best case scenario a function would rank each point of interest class.
-Due to limited time we only explicitly ranked the most important features.
+In the best case scenario a function would rank each point of interest class but
+due to the limited time only the most important features were explicitly ranked.
 
 \begin{sqlcode}
 CREATE OR REPLACE FUNCTION localrank_poi(type VARCHAR) RETURNS INTEGER
@@ -218,7 +222,7 @@ wal_buffers = 16MB
 default_statistics_target = 500
 \end{bashcode}
 
-For speed up the import, we disabled transactional features of PostgreSQL. \footnote{\url{http://www.databasesoup.com/2015/02/running-with-scissors-mode.html}}.
+For speed up the import, the disabled transactional features of PostgreSQL have been disabled. \footnote{\url{http://www.databasesoup.com/2015/02/running-with-scissors-mode.html}}.
 
 \begin{bashcode}
 bgwriter_lru_maxpages = 0
@@ -231,8 +235,15 @@ wal_log_hints = off
 
 \subsection{Indizes}
 
-We use clustered indizes on the geometries to provide fast tile lookup.
-TODO: More details
+For each table a GiST\footnote{\url{http://www.postgresql.org/docs/9.3/static/gist-intro.html}} index on the geometry
+is created and a clustered geohashed index of the extens of a geometry\footnote{\url{http://postgis.net/docs/Box2D.html}} to make lookups that check if a geometry is in a certain tile faster. Especially the clustered index hash helped in speeding up the queries.
+
+\begin{sqlcode}
+"osm_places_geom" gist (geometry)
+"osm_places_geom_geohash btree" (
+    st_geohash(st_transform(st_setsrid(box2d(geometry)::geometry, 3857), 4326))
+) CLUSTER
+\end{sqlcode}
 
 \section{Data Style}\label{data_style}
 
@@ -307,7 +318,7 @@ The buffer value on a layer defines how many pixels around each tile will be inc
   \caption{Example for buffer values}
 \end{figure}
 
-The figure above is a good example to see the result of the buffer value. We can see that there are rivers but no other data, therefore the rivers must have a larger buffer value than the other layers.
+The figure above is a good example to see the result of the buffer value. Apart from the rivers there is no other data, therefore the rivers must have a larger buffer value than the other layers.
 
 \subsubsection{Overzooming}\label{overzooming}
 The min- and maxzoom values define on which zoom levels there is data. This does not mean that it is not possible to zoom deeper in that the maxzoom value.
@@ -359,13 +370,13 @@ housenum\_label &  &  &  &  &  &  &  &  &  &  &  &  &  &  & x
 \section{Reverse Engineering Process}\label{reverse_engineering_process}
 One of the main requirements of this project was to make our vector tiles compatible with the Mapbox Streets vector tiles\footnote{\url{https://www.mapbox.com/developers/vector-tiles/mapbox-streets-v6/}}.
 \\
-We didn't define this requirement from the beginning, it evolved during the construction of our first prototype.
-Therefore we spent a lot of time making our vector tiles as similar as possible to the ones of Mapbox.
+This requirement has not been defined since the beginning, it evolved during the construction of our first prototype.
+Therefore a lot of time has been spent making our vector tiles as similar as possible to the ones of Mapbox.
 \\
-The sections below describe the tools and methods we used to achieve the goal of Mapbox Streets compatibility.
+The sections below describe the tools and methods that were used to achieve the goal of Mapbox Streets compatibility.
 
 \subsection{Vector Tile Format}\label{vector_tile_format}
-To better understand what the vector tile compare tool does, we will give a high level introduction to the vector tiles format.
+To better understand what the vector tile compare tool does, a high level introduction to the vector tiles format will be given below.
 \\\\
 A vector tile can consist of one or more named layers and containing one or more features. A feature consist of attributes and a geometry (point, linestring or polygon). Attributes are represented as a dictionary of key, value pairs. 
 \\\\
@@ -408,10 +419,12 @@ Mapbox Streets v6 vector tile(0/0/0):
 \end{jsoncode}
 
 \section{Quality Assurance Tools}\label{tools}
-During the prototyping phase we realized, that we need to build tools which help us track the progress of compatibility.
+During the prototyping phase it was realized, that tools need to be built to help the contributors track the progress of Mapbox Streets compatibility.
 
 \subsection{Vector Tile Compare}\label{vector_tile_compare}
-The Vector Tile Compare tool analyzes vector tiles and outputs interesting information like layers and attributes. We generated this output for the same vector tiles of Mapbox Streets and our own (Open Streets). Next we uploaded the results to a Github repository and used the branch compare feature to compare them. 
+The Vector Tile Compare tool analyzes vector tiles and outputs interesting information like layers and attributes. 
+The output was generated for the same vector tiles of Mapbox Streets and the resulting vector tiles from osm2vectortiles (Open Streets).
+The results where then uploaded  to a Github repository and the branch compare feature was used to compare them. 
 
 \begin{figure}[H]
   \centering
@@ -422,7 +435,9 @@ The Vector Tile Compare tool analyzes vector tiles and outputs interesting infor
 This gave us a good indicator of which layers are shown on which zoom level and what attributes are contained in a layer.
 
 \subsection{Visual Compare}\label{visual_compare}
-The vector tile comparison was good to ensure that we have exactly the same data on the same zoom level. But when we started to visually compare our map with the map of Mapbox Streets, we still saw big differences. So we decided to build a visual compare tool. 
+The vector tile comparison was good to ensure that exactly the same data is present on the same zoom level as Mapbox Streets.
+But when the contributors started to visually compare the map with the map of Mapbox Streets, big differences appeared.
+The decision was made to build a compare tool that works visually to cover up bugs like these.
 
 \begin{figure}[H]
 \centering
@@ -433,6 +448,7 @@ The vector tile comparison was good to ensure that we have exactly the same data
 The figure above shows a screenshot of the Visual Compare tool. On the left side is Mapbox Streets and on the right side our Open Streets map. They both use the same visual style (OSM Bright 2\footnote{\url{https://github.com/mapbox/mapbox-studio-osm-bright.tm2}}). When you zoom in on the right side of the map, it automatically zooms in on the left side. This tool was very helpful to find all the differences.
 
 \section{Improvement Process}
+
 This section describes what we did, when we found a visual difference. When we identified a visual difference with the Vector Compare or Visual Compare tool, we first checked if the missing data is included in our import mapping. If this was not the case, we used the TagFinder tool\footnote{\url{https://wiki.openstreetmap.org/wiki/TagFinder}} to find the right OSM key, value pair of the missing item. Next we included the key, value pair into our import mapping and re-imported the OSM data. To see the item on the map, the SQL query in the data style needs to be altered to fetch the added item. Now the missing item should appear on the map. During this process we used mostly Mapbox Studio Classic\footnote{\url{https://www.mapbox.com/mapbox-studio-classic/}} as the map can be rendered on the fly after the query has been altered.
 
 

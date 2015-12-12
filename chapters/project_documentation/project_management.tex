@@ -2,7 +2,7 @@
 
 \section{Software Development Process}
 
-An agile approach based on RUP has been used as the process model of this project. At the kickoff meeting the schedule with the milestones were defined and the first tasks were assigned to the alpha milestone. In frequent meetings the progress of these tasks were tracked and new tasks were created.\\
+An agile approach based on RUP has been used as the process model of this project. At the kickoff meeting the schedule with the milestones were defined and the first tasks were assigned to the alpha milestone. In frequent meetings the progress of these tasks were tracked and new tasks were created. The work was divided into two to three week iterations with a deliverable version at each end of the iteration.\\
 Constant evolution has been favored over long term planning and this approach has proven itself for this type of work, where unexpected problems are the rule not the exception.
 
 \subsection{Github}\label{github}
@@ -82,11 +82,11 @@ Contributor responsible for rendering infrastructure and Python scripts.\\ \hlin
 \end{table}
 
 \section{Risks}\label{risks}
-In general this project was hazardous, as not a lot of cartographic knowledge was present at the beginning. The risk was reduced by contacting our advisors early, when ever problems appeared. The knowledge gap was filled very fast, due to the availability of superb information sources online. The figure below shows only project specific risks, which have been assessed and dealt with accordingly.
+In general this project was hazardous, as not a lot of cartographic knowledge was present at the beginning. The risk was reduced by contacting the advisors early, when ever problems appeared. The knowledge gap was filled very fast, due to the availability of superb information sources online. The figure below shows only project specific risks, which have been assessed and dealt with accordingly.
 
 \begin{table}[H]
 \centering
-    \begin{tabular}{p{3.5cm} p{7.5cm} p{1.8cm}}
+    \begin{tabular}{p{4.5cm} p{5.5cm} p{1.8cm}}
     \hline
     Risk & Measurement & Probability (1-6)\\
     \hline
@@ -101,9 +101,9 @@ In general this project was hazardous, as not a lot of cartographic knowledge wa
     \caption{Risks and measurements}
 \end{table}
 
-\paragraph{High technical complexity} The project involved a lot of different technologies, as we built up a whole workflow to produce vector tiles. As a measurement the elaboration phase was used to create a first working prototype, which should prove the implementation concept.
+\paragraph{High technical complexity} The project involved a lot of different technologies, as the workflow to produce vector tiles was built up. As a measurement the elaboration phase was used to create a first working prototype, which should prove the implementation concept.
 
-\paragraph{Insufficient tracking of project progress} The project progress was tracked on Github, so the progress was at any time publicly visible. Regular meetings with our advisors helped staying focused on the project goals.
+\paragraph{Insufficient tracking of project progress} The project progress was tracked on Github, so the progress was at any time publicly visible. Regular meetings with the advisors helped staying focused on the project goals.
 
 \paragraph{Infrastructure not sufficient} The rendering process of vector tiles is a very ressource intense task. The school infrastructure was not enough to fulfill the project goals in time. Therefore an alternative platform with more processing power was used to complete the rendering task in time.\\
 
@@ -179,16 +179,16 @@ script:
 
 
 \section{Guidelines}\label{guidelines}
-To have homogeneous software we settled on common guidelines in the beginning of the project.
+To have homogeneous software the contributors have settled on common guidelines in the beginning of the project.
 
 \subsection{Releases}
-We use semantic versioning \footnote{\url{http://semver.org/}}. At the
-end of each milestone a new release will be created.
+Semantic versioning \footnote{\url{http://semver.org/}} should be used for releases.
+At the end of each milestone a new release will be created.
 
 \subsection{Git}\label{git}
 \paragraph{Commit Messages}
-We use the seven rules of great git commit
-messages\footnote{\url{http://chris.beams.io/posts/git-commit/}}.
+The seven rules of great git commit
+messages\footnote{\url{http://chris.beams.io/posts/git-commit/}} should be used.
 
 \paragraph{Rewriting}
 Git history should be kept clean and therefore local branches should be
@@ -199,7 +199,7 @@ To avoid unnecessary merge messages one should always use the
 \texttt{-\/-rebase} parameter.
 
 \subsection{Workflow}\label{workflow}
-We use the Feature Branch Workflow\footnote{\url{https://www.atlassian.com/git/tutorials/comparing-workflows/feature-branch-workflow/}}.
+The Feature Branch Workflow\footnote{\url{https://www.atlassian.com/git/tutorials/comparing-workflows/feature-branch-workflow/}} should be used.
 
 Every project member has a local repository with a copy of the remote
 repository. For each feature ticket in GitHub a separate branch
@@ -208,15 +208,15 @@ created and needs to be merged into the \texttt{master} branch by an other
 
 \subsection{Coding Standards}
 
-\paragraph{Bash} We use Bash for our Docker image entrypoints and follow
+\paragraph{Bash} Bash was used for the Docker image entrypoints and follow
 the rules of Defensive Bash Programming \footnote{\url{http://www.kfirlavi.com/blog/2012/11/14/defensive-bash-programming/}}.
 
-\paragraph{Python} For Python code we want to stay PEP-8\footnote{\url{https://www.python.org/dev/peps/pep-0008/}} compliant and write idiomatic Python code according to PEP-20\footnote{\url{https://www.python.org/dev/peps/pep-0020/}}.
+\paragraph{Python} Python code should stay PEP-8\footnote{\url{https://www.python.org/dev/peps/pep-0008/}} compliant and write idiomatic Python code according to PEP-20\footnote{\url{https://www.python.org/dev/peps/pep-0020/}}.
 
 \paragraph{JavaScript} The JavaScript code is checked using ESLint\footnote{\url{http://eslint.org/}}
 
-\paragraph{SQL} Our PostgreSQL code is using upper case for the key words. Apart from that we try to have nice formatted SQL code and use functions
-if necessary to keep the queries DRY\footnote{\url{https://en.wikipedia.org/w/index.php?title=Don%27t_repeat_yourself&oldid=691047461}}.
+\paragraph{SQL} The PostgreSQL code is using upper case for the key words. Apart from nice formatted SQL code and functions should be used
+to keep the queries DRY\footnote{\url{https://en.wikipedia.org/w/index.php?title=Don%27t_repeat_yourself&oldid=691047461}}.
 
 \paragraph{Dockerfile} Dockerfiles follow the best practices\footnote{\url{https://docs.docker.com/engine/articles/dockerfile\_best-practices/}} defined by Docker.
 

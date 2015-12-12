@@ -15,7 +15,10 @@ The scalerank of the place, marine, state and road labels should be improved. Ou
 State labels are used to display states of big countries like USA, Russia or China. More state labels could be added. 
 
 \paragraph{Country boundaries}
-At the moment we use a mix of Natural Earth and OSM data for the administrative boundaries. We had to implement this layer with data of both data sources, because we had some graphical issues with the OSM data on small zoom levels. Using Natural Earth data alone is not suitable, because the data is generalized. Therefore it does not look good on higher zoom levels. We could probably find a better data source for administrative boundaries.
+
+A mix of Natural Earth and OSM data is used for the administrative boundaries.
+This layer is using both data sources, because OSM has some issues with marine borders and simplified borders on lower zoom levels.
+Using Natural Earth data alone is not suitable, because the data is generalized. Therefore it does not look good on higher zoom levels. For the next release a better data source should be chosen for administrative boundaries.
 
 \paragraph{Country Name Translation Rule}
 Mapbox has defined a fallback rule\footnote{\url{https://www.mapbox.com/developers/vector-tiles/mapbox-streets-v6/}} for the country names. We struggled implementing it and had to prioritize on other features.
@@ -27,7 +30,11 @@ Mapbox uses different maki icons\footnote{\url{https://www.mapbox.com/maki/}} fo
 Check if all the data required for a Mapbox style like Mapbox Terrain\footnote{\url{https://www.mapbox.com/developers/vector-tiles/mapbox-terrain/}} is included in our vector tiles
 
 \paragraph{Exclude Water in Rendering Process}
-When we implemented the vector tile rendering process, we realized that a lot of rendering time could be saved when the water (no data) is excluded. It turned out, that deciding if a vector tiles will have no data, is not an easy problem. So we just render everything and remove the "empty" vector tiles afterwards.
+
+When the vector tile rendering process was implemented, it was realized that a lot of rendering time could be saved
+when the water (no data) is excluded.
+It turned out, that deciding if a vector tiles will have no data, is not an easy problem. At the current stage of the project
+everything is rendered and the "empty" vector tiles are removed afterwards.
 
 \subsection{New Features}\label{new_features}
 
@@ -38,9 +45,11 @@ One of the main targets of our bachelor thesis is to render the vector tiles of 
 A big request of the Swiss OSM community was to provide updated vector tiles based on the diff\footnote{\url{http://wiki.openstreetmap.org/wiki/Planet.osm/diffs}} files.
 
 \paragraph{Faster Tile Server}
-During our research of existing vector tile servers we found out, that there is no robust, scalable vector tile server available. This could may even be a separate project.
+There is no robust and scalable raster tile server based on vector tiles available yet.
+This may even be a separate project.
 
 \paragraph{Geographic Name Search}
-If we want to fulfill the long term goal of this project to provide an offline map, we should definitely implement basic geographic name search capability.
+
+To fulfill the long term goal of this project to provide an offline map a basic geographic name search could be implemented.
 
 \newpage{}

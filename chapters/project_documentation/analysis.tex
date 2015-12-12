@@ -56,7 +56,7 @@ Custom curated labels for marine, countries and states.
 \newpage
 \subsection{Export}
 Export can either be done locally which will process one bounding box or in parallel on several
-remote machines. In this thesis we will only focus on local export.
+remote machines. This thesis was focused on the local export only.
 
 \paragraph{open-streets}
 The data style project is the most essential component which pulls together all the
@@ -68,7 +68,7 @@ A process which is using the open-streets.tm2source project to create vector til
 %------------------------------------------------------
 \subsection{Tooling}
 
-This chapter describes the various tools we created to support the development process.
+This chapter describes the various tools that were created to support the development process.
 
 \paragraph{verify}
 Verify size and correctness of MBTiles files.
@@ -190,10 +190,9 @@ For  single cities or regions the Metro extracts from Mapzen\footnote{\url{https
 The data is available in the PBF\footnote{\url{http://wiki.openstreetmap.org/wiki/PBF_Format}} and OSM XML format \footnote{\url{https://wiki.openstreetmap.org/wiki/OSM_XML}}. 
 Data in PBF format is 30\% smaller and 5-6 times faster to read and write than the bzipped OSM XML version.
 \\
-We use imposm3 to import the OSM data into our PostGIS database.
+Imposm3 was used to import the OSM data into the PostGIS database.
 Selected tags \footnote{\url{http://wiki.openstreetmap.org/wiki/Tags}} and their geometries are defined in an import mapping explicitly.
-Because imposm3 cannot match two types of polygons (e.g. polygon and point) we need
-to create a table for each geometry type.
+Because imposm3 cannot match two types of polygons (e.g. polygon and point) a table was created for each geometry type.
 
 \begin{table}[H]
 \centering
@@ -246,7 +245,7 @@ project takes care of a lot of issues that happen with coastlines
 and provide it in a convenient format. The data is checked by the OSM community
 and released separately.
 \\
-We use water polygons \footnote{\url{http://openstreetmapdata.com/data/water-polygons}} from OpenStreetMapData. This data set ensures that the water polygons
+Water polygons  \footnote{\url{http://openstreetmapdata.com/data/water-polygons}} from OpenStreetMapData were used for the ocean parts of the world. This data set ensures that the water polygons
 work well together with other \osm{} data and splits big water polygons into multiple 
 pieces for performance.
 
@@ -267,10 +266,9 @@ pieces for performance.
 The Natural Earth \footnote{\url{http://www.naturalearthdata.com/}} data set provides manually curated data of cultural and physical features of the world. Natural Earth data is especially useful at higher zoom levels.
 \\
 The imported Natural Earth data results in more than 100 tables, but only a few
-are relevant for our use case.
-We use country, state borders and large lakes from Natural Earth data for the lower zoom
-levels.
-We use the following data from Natural Earth:
+are relevant for our use case. Country, state borders and large lakes are taken from Natural Earth data for the lower zoom levels.
+
+The following data sets are used from Natural Earth:
 
 \begin{itemize}
 \item Label ranks of big cities\footnote{\url{http://www.naturalearthdata.com/downloads/10m-cultural-vectors/10m-populated-places/}}
@@ -374,7 +372,8 @@ Roads are split up into normal roads, tunnels and bridges after a certain zoom l
 \newpage
 \subsection{Points of Interest}
 Most POIs are in fact points, but buildings tagged with POI attributes
-are often polygons, which is why we need to create tables for both points and polygons.
+are often polygons, which is why tables for both points and polygons are created.
+
 The \texttt{localrank} and \texttt{scalerank} of the \texttt{\#poi\_label} layer are calculated from the \texttt{type} and \texttt{area} attributes.
 The \texttt{address} field is pulled together from the various address attributes on the tables (\texttt{street}, \texttt{housenumber}, \texttt{place}, \texttt{city}, \texttt{postcode} and \texttt{country}).
 

@@ -80,15 +80,14 @@ files\footnote{\url{http://imposm.org/docs/imposm3/latest/tutorial.html\#diff}}
 
 \\ 
 \begin{tcolorbox}[arc=0mm,boxrule=1pt,title=Decision]\label{osm_import_tool_decision}
-For our use case it is important, that the import is efficent and that
-the import tool supports updating based on OSM diff files. Imposm 3 is
-faster than osm2pgsql and supports updatability. So we decided to take
-imposm for importing.
+For the use case of this thesis it is important, that the import is efficent and that
+the import tool supports updating based on OSM diff files. Imposm3 is
+faster than osm2pgsql and supports updatability and therefore it was decided to use imposm3 for importing.
 \end{tcolorbox}
 
 \section{Vector Tile Format}\label{vector-tile-formats}
 
-Vector tiles is quite a broad term. If we talk about vector tiles in thesis we usually mean Mapbox vector tiles which is a custom open specification how vector tiles should be structured.
+Vector tiles are a broad term. In this thesis vector tiles correspond to Mapbox vector tiles which is a custom open specification how vector tiles should be structured.
 
 \paragraph{Mapbox Vector Tiles}
 
@@ -116,7 +115,7 @@ proprietary.
 
 \\
 \begin{tcolorbox}[arc=0mm,boxrule=1pt,title=Decision]\label{vector_tile_spec_impl_decision}
-Because one of the main requirements of this project was to provide Mapbox Streets compatible vector tiles and Mapbox provides very good tools to handle vector tiles, we had almost no other choice than going with Mapbox's implementation of vector tiles.
+Because one of the main requirements of this project was to provide Mapbox Streets compatible vector tiles and Mapbox provides very good tools to handle vector tiles, there was no other choice than going with Mapbox's implementation of vector tiles.
 \end{tcolorbox}
 
 \section{Vector Tile Server}\label{vector_tile_server}
@@ -181,6 +180,6 @@ on top of Mapnik and renderd using C++. Instead of using a spatial database as s
 
 \\
 \begin{tcolorbox}[arc=0mm,boxrule=1pt,title=Decision]\label{tile_server_decision}
-The plan was to perform the load test on each version of the vector tile server and then make the decision based on the results. Due to the fact, that the test results of tessera where good enough for the thesis use case and it didn't take much time to implement, we decided to use tessera as raster tile server.
+The plan was to perform the load test on each version of the vector tile server and then make the decision based on the results. Due to the fact, that the test results of tessera where good enough for the thesis use case and it didn't take much time to implement, it was decided to use tessera as raster tile server.
 If somebody needs a high-performance tile server, one should probably think about the second variant.
 \end{tcolorbox}
