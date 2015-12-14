@@ -13,13 +13,13 @@ managing complex infrastructure.
 \section{Vision}\label{part1_vision}
 
 Michal Migurski published on March 15, 2013 a blog
-post\footnote{\url{http://mike.teczno.com/notes/postgreslessness-mapnik-vectiles.html}},
+post\cite{1_mike.teczno.com_2013},
 in which he described his first attempts to use vector tiles as a source
 for the Mapnik tile renderer and his vision for vector tiles.
 \newline{}
 Vector tiles only contain geometries and metadata.
 The visual style is applied on the fly when the tile is requested, it is separated from the
-actual vector data. Vector tiles are smaller than raster tiles, this enables high resolution maps, fast map loads and efficient caching.\footnote{ \url{https://www.mapbox.com/developers/vector-tiles/}} \\
+actual vector data. Vector tiles are smaller than raster tiles, this enables high resolution maps, fast map loads and efficient caching.\cite{2_mapbox.com_2015} \\
 Our mission is to bring the power of vector tiles to anyone and provide
 the data free and as Open Source project.
 
@@ -42,3 +42,5 @@ several deliverables were defined in the project proposal.
 \item
   Optional: Vector tiles for the entire world
 \end{itemize}
+
+\paragraph{Differentiation} The resulting vector tiles allow creating an alternative base map, which is customizable. The vector tiles are not meant to be queried and do not support custom overlays. Additional map features need to be implemented with the help of other libraries. 

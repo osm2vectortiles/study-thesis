@@ -11,9 +11,9 @@ An organization named osm2vectortiles was created with the following two reposit
 
 \begin{itemize}
 \item
-  \textbf{osm2vectortiles} contains the project\footnote{\url{https://github.com/osm2vectortiles/osm2vectortiles}}
+  \textbf{osm2vectortiles} contains the project\cite{pm_1_github_2015}
 \item
-  \textbf{osm2vectortiles-thesis} contains the thesis\footnote{\url{https://github.com/osm2vectortiles/osm2vectortiles-thesis}}
+  \textbf{osm2vectortiles-thesis} contains the thesis\cite{pm_2_github_2015}
 \end{itemize}
 
 \section{Schedule}
@@ -128,7 +128,7 @@ This tool makes it possible to verify the different attributes of features and e
   \caption{Mapbox Studio Classic Debug Viewer}
 \end{figure}
 
-The Open Source partner Klokan Technologies \footnote{\url{http://www.klokantech.com/}} also provided a OpenLayers 3\footnote{\url{http://openlayers.org/}} based debug viewer,
+The Open Source partner Klokan Technologies \cite{pm_3_gmbh_2015} also provided a OpenLayers 3\cite{pm_4_openlayers.org_2015} based debug viewer,
 which supports the same features but allows looking at arbitrary TileJSON urls.
 
 \begin{figure}[H]
@@ -156,8 +156,8 @@ With the \nameref{vector_tile_compare} tool the differences between Mapbox Stree
 
 \section{Integration Test}
 
-In Travis CI\footnote{\url{travis-ci.org}}  the entire workflow was completed for a small data sample on each commit.
-Because the entire workflow is configured with Docker Compose \footnote{\url{https://docs.docker.com/compose/}} the CI server had to execute all import steps in serial order. This is a straightforward way to check if all components work together correctly
+In Travis CI\cite{pm_5_travis-ci.org_2015}  the entire workflow was completed for a small data sample on each commit.
+Because the entire workflow is configured with Docker Compose \cite{pm_6_docs.docker.com_2015} the CI server had to execute all import steps in serial order. This is a straightforward way to check if all components work together correctly
 and although it is a simple setup it has helped tremendously during project development, catching bugs
 like missing tables or SQL typos.
 
@@ -182,13 +182,13 @@ script:
 To have homogeneous software the contributors have settled on common guidelines in the beginning of the project.
 
 \subsection{Releases}
-Semantic versioning \footnote{\url{http://semver.org/}} should be used for releases.
+Semantic versioning \cite{pm_7_preston-werner_2015} should be used for releases.
 At the end of each milestone a new release will be created.
 
 \subsection{Git}\label{git}
 \paragraph{Commit Messages}
 The seven rules of great git commit
-messages\footnote{\url{http://chris.beams.io/posts/git-commit/}} should be used.
+messages\cite{pm_8_chris.beams.io_2015} should be used.
 
 \paragraph{Rewriting}
 Git history should be kept clean and therefore local branches should be
@@ -198,8 +198,8 @@ squashed meaningfully.
 To avoid unnecessary merge messages one should always use the
 \texttt{-\/-rebase} parameter.
 
-\subsection{Workflow}\label{workflow}
-The Feature Branch Workflow\footnote{\url{https://www.atlassian.com/git/tutorials/comparing-workflows/feature-branch-workflow/}} should be used.
+\subsection{Workflow}\label{git-workflow}
+The Feature Branch Workflow\cite{pm_9_atlassian_git_tutorial_2015} should be used.
 
 Every project member has a local repository with a copy of the remote
 repository. For each feature ticket in GitHub a separate branch
@@ -209,15 +209,15 @@ created and needs to be merged into the \texttt{master} branch by an other
 \subsection{Coding Standards}
 
 \paragraph{Bash} Bash was used for the Docker image entrypoints and follow
-the rules of Defensive Bash Programming \footnote{\url{http://www.kfirlavi.com/blog/2012/11/14/defensive-bash-programming/}}.
+the rules of Defensive Bash Programming \cite{pm_10_lavi_2012}.
 
-\paragraph{Python} Python code should stay PEP-8\footnote{\url{https://www.python.org/dev/peps/pep-0008/}} compliant and write idiomatic Python code according to PEP-20\footnote{\url{https://www.python.org/dev/peps/pep-0020/}}.
+\paragraph{Python} Python code should stay PEP-8\cite{pm_11_python.org_2015} compliant and write idiomatic Python code according to PEP-20\cite{pm_12_python.org_2015}.
 
-\paragraph{JavaScript} The JavaScript code is checked using ESLint\footnote{\url{http://eslint.org/}}
+\paragraph{JavaScript} The JavaScript code is checked using ESLint\cite{pm_13_eslint.org_2015}
 
 \paragraph{SQL} The PostgreSQL code is using upper case for the key words. Apart from nice formatted SQL code and functions should be used
-to keep the queries DRY\footnote{\url{https://en.wikipedia.org/w/index.php?title=Don%27t_repeat_yourself&oldid=691047461}}.
+to keep the queries DRY\cite{pm_14_wikipedia_2015}.
 
-\paragraph{Dockerfile} Dockerfiles follow the best practices\footnote{\url{https://docs.docker.com/engine/articles/dockerfile\_best-practices/}} defined by Docker.
+\paragraph{Dockerfile} Dockerfiles follow the best practices\cite{pm_15_docs.docker.com_2015} defined by Docker.
 
 %---------------------------------------------------------------

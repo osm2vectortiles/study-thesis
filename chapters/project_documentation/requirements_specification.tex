@@ -23,7 +23,7 @@ There are three user groups interested in this project:
 The map designer brings his new map design to the system administrator and tells him to host the map. The system administrator can download the vector tiles of the osm2vectortiles website and serve the map with the help of a vector tile server.
 
 \paragraph{Clientside Rendering}
-The map designer brings his new map design to the system administrator and tells him to host the map. The system administrator does not want to provide a big server that can handle the heavy rendering work. So he decides to use Mapbox GL\footnote{\url{https://www.mapbox.com/mapbox-gl-js/api/}} which offloads the rendering work to the client. In order to use Mapbox GL he needs to statically serve the vector tiles. 
+The map designer brings his new map design to the system administrator and tells him to host the map. The system administrator does not want to provide a big server that can handle the heavy rendering work. So he decides to use Mapbox GL\cite{rs_1_mapbox.com_2015} which offloads the rendering work to the client. In order to use Mapbox GL he needs to statically serve the vector tiles. 
 
 \paragraph{Own vector tiles}
 Institutions which provide geospatial data would like to follow the trend of vector tiles and provide their data in vector tile format. These institutions can use this project for this matter. They can easily modify this project to use it with their data. 
@@ -33,7 +33,7 @@ Institutions which provide geospatial data would like to follow the trend of vec
 The non functional requirements are the key to success of this project. If the following requirements can be fulfilled, the specified users will be able to benefit form our project.
 
 \paragraph{Usability}
-The vector tile server must be usable with Kitematic\footnote{\url{https://kitematic.com/}}. Kitematic is an easy to use user interface for docker. 
+The vector tile server must be usable with Kitematic\cite{rs_2_kitematic_2015}. Kitematic is an easy to use user interface for docker. 
 
 \paragraph{Learnability}
 
@@ -51,7 +51,7 @@ The tileserver must handle 10 concurrent users per second.
 
 \paragraph{Compatibility}
 
-The vector tiles must contain all feature sets Mapbox Streets contains. If full compatibility with Mapbox Streets\footnote{\url{https://www.mapbox.com/developers/vector-tiles/mapbox-streets-v6/}} can be guaranteed all Mapbox visual styles can be used with our vector tiles.
+The vector tiles must contain all feature sets Mapbox Streets contains. If full compatibility with Mapbox Streets\cite{22_mapbox.com_2015} can be guaranteed all Mapbox visual styles can be used with our vector tiles.
 
 \paragraph{Vector Tile Size}
 

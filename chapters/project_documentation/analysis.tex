@@ -112,7 +112,7 @@ are part of the ETL process to import data into the database.
   \item \texttt{update-scaleranks} depends on already imported data from Natural Earth and OSM to be able to update OSM places with scaleranks from Natural Earth.
 \end{itemize}
 
-The data container pattern\footnote{\url{http://container42.com/2013/12/16/persistent-volumes-with-docker-container-as-volume-pattern/}} is used in \texttt{cache} and \texttt{pgdata}. \\
+The data container pattern\cite{2_container42.com_2015} is used in \texttt{cache} and \texttt{pgdata}. \\
 The data only containers are mounted from \texttt{import-osm} for storing cache data while importing and in \texttt{postgis} for storing the database files.
 
 \begin{figure}[H]
@@ -147,8 +147,8 @@ The data only containers are mounted from \texttt{import-osm} for storing cache 
 The import workflow is a view under the hood of the different components.
 
 \begin{itemize}
-\item Using the GDAL tool ogr2org\footnote{\url{http://www.gdal.org/ogr2ogr.html}} the Natural Earth SQLite file and custom GeoJSON files are imported into PostGIS and transformed into the right projection.
-\item imposm3\footnote{\url{https://github.com/omniscale/imposm3}} imports the planet file according to the mapping configuration into PostGIS.
+\item Using the GDAL tool ogr2org\cite{3_gdal.org_2015} the Natural Earth SQLite file and custom GeoJSON files are imported into PostGIS and transformed into the right projection.
+\item imposm3\cite{4_github_2015} imports the planet file according to the mapping configuration into PostGIS.
 \item A custom python script transforms the classifications in the file into SQL functions and appends them to the existing function.sql file which is loaded into PostGIS as well.
 \item The update scaleranks script operates on the database only using both tables from Natural Earth and OSM to update the scalerank of places.
 \end{itemize}
@@ -162,7 +162,7 @@ The import workflow is a view under the hood of the different components.
 \newpage
 \subsection{Export}\label{workflow-export}
 
-For generating the vector tiles the tilelive tool \texttt{tl} \footnote{\url{https://github.com/mojodna/tl}} is used which wraps
+For generating the vector tiles the tilelive tool \texttt{tl}\cite{5_github_2015} is used which wraps
 around Mapnik. 
 %\marginpar{\nameref{data_style} is a Mapbox Studio source project.}
 The data style defines all feature sets (layers) and is transformed into a Mapnik XML stylesheet by the \\
@@ -182,16 +182,16 @@ The schema is flat and has no relations. Each table contains information about i
 
 \subsection{OpenStreetMap Planet}
 
-The cornerstone of the entire map is \osm{} data from published snapshots from OSM Planet\footnote{\url{http://planet.osm.org/}}.
+The cornerstone of the entire map is \osm{} data from published snapshots from OSM Planet\cite{6_planet.osm.org_2015}.
 %\marginpar{The OSM data is perfect for high zoom levels where detailed coverage of local areas is important.}
-Smaller extracts for single countries and continents are available from Geofabrik\footnote{\url{http://download.geofabrik.de/}}.
-For  single cities or regions the Metro extracts from Mapzen\footnote{\url{https://mapzen.com/data/metro-extracts/}} can be used.
+Smaller extracts for single countries and continents are available from Geofabrik\cite{7_download.geofabrik.de_2015}.
+For  single cities or regions the Metro extracts from Mapzen\cite{8_mapzen.com_2015} can be used.
 \\
-The data is available in the PBF\footnote{\url{http://wiki.openstreetmap.org/wiki/PBF_Format}} and OSM XML format \footnote{\url{https://wiki.openstreetmap.org/wiki/OSM_XML}}. 
+The data is available in the PBF\cite{9_wiki.openstreetmap.org_2015} and OSM XML format \cite{10_wiki.openstreetmap.org_2015}. 
 Data in PBF format is 30\% smaller and 5-6 times faster to read and write than the bzipped OSM XML version.
 \\
 Imposm3 was used to import the OSM data into the PostGIS database.
-Selected tags \footnote{\url{http://wiki.openstreetmap.org/wiki/Tags}} and their geometries are defined in an import mapping explicitly.
+Selected tags\cite{11_wiki.openstreetmap.org_2015} and their geometries are defined in an import mapping explicitly.
 Because imposm3 cannot match two types of polygons (e.g. polygon and point) a table was created for each geometry type.
 
 \begin{table}[H]
@@ -221,7 +221,7 @@ Because imposm3 cannot match two types of polygons (e.g. polygon and point) a ta
 
 \subsection{Custom Curated Labels}
 
-The placement and importance of labels of countries, states and seas matters\footnote{\url{https://axismaps.github.io/thematic-cartography/articles/labeling.html}} and is important to get right. Data from the overpass API \footnote{\url{https://wiki.openstreetmap.org/wiki/Overpass_API}} is converted into GeoJSON and
+The placement and importance of labels of countries, states and seas matters\cite{12_axismaps.github.io_2015} and is important to get right. Data from the overpass API \cite{13_wiki.openstreetmap.org_2015} is converted into GeoJSON and
 manually edited and enhanced with a label rank. For sea labels custom lines have been drawn to place the label along this line.
 
 \begin{table}[H]
@@ -240,12 +240,12 @@ manually edited and enhanced with a label rank. For sea labels custom lines have
 \subsection{OpenStreetMapData}
 
 Certain \osm{} data like borders and land polygons is very sensitive for change.
-The OpenStreetMapData\footnote{\url{http://openstreetmapdata.com/}}
+The OpenStreetMapData\cite{14_openstreetmapdata.com_2015}
 project takes care of a lot of issues that happen with coastlines
 and provide it in a convenient format. The data is checked by the OSM community
 and released separately.
 \\
-Water polygons  \footnote{\url{http://openstreetmapdata.com/data/water-polygons}} from OpenStreetMapData were used for the ocean parts of the world. This data set ensures that the water polygons
+Water polygons\cite{15_openstreetmapdata.com_2015} from OpenStreetMapData were used for the ocean parts of the world. This data set ensures that the water polygons
 work well together with other \osm{} data and splits big water polygons into multiple 
 pieces for performance.
 
@@ -263,7 +263,7 @@ pieces for performance.
 \newpage
 \subsection{Natural Earth}
 
-The Natural Earth \footnote{\url{http://www.naturalearthdata.com/}} data set provides manually curated data of cultural and physical features of the world. Natural Earth data is especially useful at higher zoom levels.
+The Natural Earth \cite{16_naturalearthdata.com_2015} data set provides manually curated data of cultural and physical features of the world. Natural Earth data is especially useful at higher zoom levels.
 \\
 The imported Natural Earth data results in more than 100 tables, but only a few
 are relevant for our use case. Country, state borders and large lakes are taken from Natural Earth data for the lower zoom levels.
@@ -271,9 +271,9 @@ are relevant for our use case. Country, state borders and large lakes are taken 
 The following data sets are used from Natural Earth:
 
 \begin{itemize}
-\item Label ranks of big cities\footnote{\url{http://www.naturalearthdata.com/downloads/10m-cultural-vectors/10m-populated-places/}}
-\item Major lakes\footnote{\url{http://www.naturalearthdata.com/downloads/10m-physical-vectors/10m-lakes/}}
-\item Country\footnote{\url{http://www.naturalearthdata.com/downloads/10m-cultural-vectors/10m-admin-0-countries/}} and administrative\footnote{\url{http://www.naturalearthdata.com/downloads/10m-cultural-vectors/10m-admin-1-states-provinces/}} borders including disputed borders\footnote{\url{http://www.naturalearthdata.com/downloads/10m-cultural-vectors/10m-admin-0-breakaway-disputed-areas/}}
+\item Label ranks of big cities\cite{17_naturalearthdata.com_2015}
+\item Major lakes\cite{18_naturalearthdata.com_2015}
+\item Country\cite{19_naturalearthdata.com_2015} and administrative\cite{20_naturalearthdata.com_2015} borders including disputed borders\cite{21_naturalearthdata.com_2015}
 \end{itemize}
 
 
@@ -301,7 +301,9 @@ The following data sets are used from Natural Earth:
 \newpage
 \section{Layer Schema}\label{layer-schema}
 
-The layer schema tries to stay compliant to the Mapbox Streets v6 layer reference \footnote{\url{https://www.mapbox.com/developers/vector-tiles/mapbox-streets-v6/}} and Mapbox Streets v5 layer reference\footnote{\url{https://www.mapbox.com/developers/vector-tiles/mapbox-streets-v5/}}. The detailed documentation on which database tables are mapped to which feature classes, can be found in the following sections.
+The layer schema tries to stay compliant to the Mapbox Streets v6 layer reference
+\cite{22_mapbox.com_2015} and Mapbox Streets v5 layer reference\cite{23_mapbox.com_2015}.
+The detailed documentation on which database tables are mapped to which feature classes, can be found in the following sections.
 
 \begin{table}[H]
 \centering
@@ -408,3 +410,6 @@ based on the population.
   \includegraphics[scale=0.6]{images/place_layer.png}
   \caption{Place label layer}
 \end{figure}
+
+\section{Limitations}\label{limitations}
+The OSM vector tiles are meant to be compatible with Mapbox Streets vector tiles, it is not possible 

@@ -10,7 +10,7 @@ Because of this the implementation consists mostly of docker containers which do
 
 Imposm 3 requires a custom mapping file to decide which tags and geometries are mapped into which table.
 
-The example data mapping\footnote{\url{http://imposm.org/docs/imposm3/latest/mapping.html}} defines that geometries of type polygon with the key value pairs \texttt{natural=wood}, \texttt{natural=land} and \texttt{tourism=zoo} should be mappend into the \texttt{landusages} table.
+The example data mapping\cite{81_imposm.org_2015} defines that geometries of type polygon with the key value pairs \texttt{natural=wood}, \texttt{natural=land} and \texttt{tourism=zoo} should be mappend into the \texttt{landusages} table.
 
 \begin{yamlcode}
 tables:
@@ -36,12 +36,12 @@ Instead of mapping all values of a certain key a explicit mapping strategy has b
 This section describes the implementation details of the database schema.
 
 \subsection{OSM id}
-All tables and views that are derived from \osm{} data has the original id\footnote{\url{https://wiki.openstreetmap.org/wiki/64-bit_Identifiers}}
+All tables and views that are derived from \osm{} data has the original id\cite{82_wiki.openstreetmap.org_2015}
 to trace back the data and be able to query a distinct \osm{} feature in a visual style.
 
 \subsection{Translations}
 All features which are label layers will contain several translations.
-The translations are directly mapped from the suffixed language code \footnote{\url{https://wiki.openstreetmap.org/wiki/Key:name}}. If a field is not available in the language, the local name is used.
+The translations are directly mapped from the suffixed language code \cite{83_wiki.openstreetmap.org_2015}. If a field is not available in the language, the local name is used.
 
 \begin{table}[H]
 \centering
@@ -135,7 +135,7 @@ RETURNS VARCHAR AS $$
   END;
 $$ LANGUAGE plpgsql IMMUTABLE;
 \end{sqlcode}
-\\
+
 Classifications are then baked into vector tile attributes
 of geometries.
 
@@ -205,8 +205,8 @@ The most intensive work is done on the database side to respond to all SQL queri
 
 \subsection{Tuning}
 
-The PostgreSQL default parameters do not deliver good performance for stronger machines\footnote{\url{https://wiki.postgresql.org/wiki/Tuning_Your_PostgreSQL_Server}-}
-For the different database machines PgTune\footnote{\url{http://pgtune.leopard.in.ua/}} calculator has been used to determine good cache and buffer sizes for data warehouse style computing.
+The PostgreSQL default parameters do not deliver good performance for stronger machines\cite{84_wiki.postgresql.org_2015}
+For the different database machines PgTune\cite{85_pgtune.leopard.in.ua_2015} calculator has been used to determine good cache and buffer sizes for data warehouse style computing.
 \\
 Example configuration for a host with 50 GB of memory.
 
@@ -222,7 +222,7 @@ wal_buffers = 16MB
 default_statistics_target = 500
 \end{bashcode}
 
-For speed up the import, the disabled transactional features of PostgreSQL have been disabled. \footnote{\url{http://www.databasesoup.com/2015/02/running-with-scissors-mode.html}}.
+For speed up the import, the disabled transactional features of PostgreSQL have been disabled. \cite{86_berkus_berkus_profile_2015}.
 
 \begin{bashcode}
 bgwriter_lru_maxpages = 0
@@ -235,8 +235,8 @@ wal_log_hints = off
 
 \subsection{Indizes}
 
-For each table a GiST\footnote{\url{http://www.postgresql.org/docs/9.3/static/gist-intro.html}} index on the geometry
-is created and a clustered geohashed index of the extens of a geometry\footnote{\url{http://postgis.net/docs/Box2D.html}} to make lookups that check if a geometry is in a certain tile faster. Especially the clustered index hash helped in speeding up the queries.
+For each table a GiST\cite{87_postgresql.org_2015} index on the geometry
+is created and a clustered geohashed index of the extens of a geometry\cite{88_postgis.net_2015} to make lookups that check if a geometry is in a certain tile faster. Especially the clustered index hash helped in speeding up the queries.
 
 \begin{sqlcode}
 "osm_places_geom" gist (geometry)
@@ -310,7 +310,7 @@ properties:
 The layer definition consist of the id (layername), datasource, fields and the properties. The datasource in this case defines how the postgis database can be accessed and which sql query needs to be executed. But the datasource could also be a geojson, shapefile, sqlite database, geotiff, kml, gpx or csv file.
 
 \subsubsection{Buffers}\label{buffers}
-The buffer value on a layer defines how many pixels around each tile will be included. It is necessary to ensure correct rendering across tile boundaries. This value is individual for each layer and depends on the type of data. Buffers for layers containing labels should have a large buffer size such as 128 pixels, whereas a layer like landuse does only need a buffers size of 4 pixels. In general, the buffer size should be set to the minimum to keep the size of the vector tiles as low as possible.\footnote{\url{https://www.mapbox.com/help/source-manual/\#buffers}}
+The buffer value on a layer defines how many pixels around each tile will be included. It is necessary to ensure correct rendering across tile boundaries. This value is individual for each layer and depends on the type of data. Buffers for layers containing labels should have a large buffer size such as 128 pixels, whereas a layer like landuse does only need a buffers size of 4 pixels. In general, the buffer size should be set to the minimum to keep the size of the vector tiles as low as possible.\cite{89_mapbox.com_2015}
 
 \begin{figure}[H]
   \centering
@@ -322,7 +322,7 @@ The figure above is a good example to see the result of the buffer value. Apart 
 
 \subsubsection{Overzooming}\label{overzooming}
 The min- and maxzoom values define on which zoom levels there is data. This does not mean that it is not possible to zoom deeper in that the maxzoom value.
-Overzooming defines to term of displaying data at higher zoom levels.\footnote{\url{https://www.mapbox.com/help/source-manual/\#overzooming}}
+Overzooming defines to term of displaying data at higher zoom levels.\cite{90_mapbox.com_2015}
 This allows us to show data on higher zoom levels, without generating vector tiles for these zoom levels.
 Mapbox has defined a rule of thumb for vector tiles. Vector tiles are useful for about 4-6 levels of overzooming. If I have a vector tile on zoom level 10, it can be stretched out up to zoom level 14 or 16.  
 
@@ -368,7 +368,7 @@ housenum\_label &  &  &  &  &  &  &  &  &  &  &  &  &  &  & x
 \end{table}
 
 \section{Reverse Engineering Process}\label{reverse_engineering_process}
-One of the main requirements of this project was to make our vector tiles compatible with the Mapbox Streets vector tiles\footnote{\url{https://www.mapbox.com/developers/vector-tiles/mapbox-streets-v6/}}.
+One of the main requirements of this project was to make our vector tiles compatible with the Mapbox Streets vector tiles\cite{22_mapbox.com_2015}.
 \\
 This requirement has not been defined since the beginning, it evolved during the construction of our first prototype.
 Therefore a lot of time has been spent making our vector tiles as similar as possible to the ones of Mapbox.
@@ -380,7 +380,7 @@ To better understand what the vector tile compare tool does, a high level introd
 \\\\
 A vector tile can consist of one or more named layers and containing one or more features. A feature consist of attributes and a geometry (point, linestring or polygon). Attributes are represented as a dictionary of key, value pairs. 
 \\\\
-Below you can find an example vector tile, which has two layers water and admin. The water layer has the attribute key "osm\_id" and value 0. If you would compare this example with the specification\footnote{\url{https://github.com/mapbox/vector-tile-spec/tree/master/1.0.1}}, one could think this is not a specification conform vector tile. The example below is a compressed vector tile. More information on what compression methods are applied can be found in the specification.
+Below you can find an example vector tile, which has two layers water and admin. The water layer has the attribute key "osm\_id" and value 0. If you would compare this example with the specification\cite{4_github_2015}, one could think this is not a specification conform vector tile. The example below is a compressed vector tile. More information on what compression methods are applied can be found in the specification.
 
 Mapbox Streets v6 vector tile(0/0/0):
 \begin{jsoncode}
@@ -445,11 +445,21 @@ The decision was made to build a compare tool that works visually to cover up bu
   \caption{Visual Compare of Mapbox Streets and Open Streets}
 \end{figure}
 
-The figure above shows a screenshot of the Visual Compare tool. On the left side is Mapbox Streets and on the right side our Open Streets map. They both use the same visual style (OSM Bright 2\footnote{\url{https://github.com/mapbox/mapbox-studio-osm-bright.tm2}}). When you zoom in on the right side of the map, it automatically zooms in on the left side. This tool was very helpful to find all the differences.
+The figure above shows a screenshot of the Visual Compare tool. On the left side is Mapbox Streets and on the right side our Open Streets map. They both use the same visual style (OSM Bright 2\cite{92_github_2015}). When you zoom in on the right side of the map, it automatically zooms in on the left side. This tool was very helpful to find all the differences.
 
 \section{Improvement Process}
 
-This section describes what we did, when we found a visual difference. When we identified a visual difference with the Vector Compare or Visual Compare tool, we first checked if the missing data is included in our import mapping. If this was not the case, we used the TagFinder tool\footnote{\url{https://wiki.openstreetmap.org/wiki/TagFinder}} to find the right OSM key, value pair of the missing item. Next we included the key, value pair into our import mapping and re-imported the OSM data. To see the item on the map, the SQL query in the data style needs to be altered to fetch the added item. Now the missing item should appear on the map. During this process we used mostly Mapbox Studio Classic\footnote{\url{https://www.mapbox.com/mapbox-studio-classic/}} as the map can be rendered on the fly after the query has been altered.
+This section describes what we did, when we found a visual difference. When we identified a visual difference with the Vector Compare or Visual Compare tool, we first checked if the missing data is included in our import mapping. If this was not the case, we used the TagFinder tool\cite{93_wiki.openstreetmap.org_2015} to find the right OSM key, value pair of the missing item. Next we included the key, value pair into our import mapping and re-imported the OSM data. To see the item on the map, the SQL query in the data style needs to be altered to fetch the added item. Now the missing item should appear on the map. During this process we used mostly Mapbox Studio Classic\cite{mapbox_studio_classic} as the map can be rendered on the fly after the query has been altered.
 
+\section{Limitations}\label{project_limitations}
 
+\paragraph{Tileserver} The tessera based tileserver does not support more than 50 concurrent users and is not meant for production use without a caching reverse proxy in front.
 
+\paragraph{Rendering Workflow} The rendering process is scalable by deploying multiple databases and vector rendering processes on very powerful hosts. For adequate rendering performance at least 16GB (or better 50GB) of memory is required to provide fast database access.
+Supporting an additional zoom level 15 would require a significant additional effort in computing capacity for rendering the additional tiles.
+
+\paragraph{Updatable Vector tiles} The vector tiles are based of an OSM planet file at a specific point in time. It is essentially a snapshot of the OSM data. Therefore the Swiss OSM community requested updatable vector tiles based on the diff files.
+
+\paragraph{Base Map} The resulting vector tiles allow creating an alternative base map, which is customizable. The vector tiles are not meant to be queried and do not support custom overlays. Additional map features need to be implemented with the help of other libraries.
+
+\paragraph{OSM Data} The vector tiles contain only a subset of all OSM data. The standard OSM basemap could not easily be replaced with our vector tiles as data source because of this limitation.

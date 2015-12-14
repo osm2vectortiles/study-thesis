@@ -21,13 +21,13 @@ This layer is using both data sources, because OSM has some issues with marine b
 Using Natural Earth data alone is not suitable, because the data is generalized. Therefore it does not look good on higher zoom levels. For the next release a better data source should be chosen for administrative boundaries.
 
 \paragraph{Country Name Translation Rule}
-Mapbox has defined a fallback rule\footnote{\url{https://www.mapbox.com/developers/vector-tiles/mapbox-streets-v6/}} for the country names. We struggled implementing it and had to prioritize on other features.
+Mapbox has defined a fallback rule\cite{22_mapbox.com_2015} for the country names. We struggled implementing it and had to prioritize on other features.
 
 \paragraph{Special Maki Icons for US Road Labels}
-Mapbox uses different maki icons\footnote{\url{https://www.mapbox.com/maki/}} for the road labels in the US.  
+Mapbox uses different maki icons\cite{101_mapbox.com_2015} for the road labels in the US.  
 
 \paragraph{Possiblity of Mapbox Terrain Visual Style}
-Check if all the data required for a Mapbox style like Mapbox Terrain\footnote{\url{https://www.mapbox.com/developers/vector-tiles/mapbox-terrain/}} is included in our vector tiles
+Check if all the data required for a Mapbox style like Mapbox Terrain\cite{102_mapbox.com_2015} is included in our vector tiles
 
 \paragraph{Exclude Water in Rendering Process}
 
@@ -42,7 +42,8 @@ everything is rendered and the "empty" vector tiles are removed afterwards.
 One of the main targets of our bachelor thesis is to render the vector tiles of the entire world. This brings new challenges like scaling our rendering infrastructure. 
 
 \paragraph{Update Vector Tiles}
-A big request of the Swiss OSM community was to provide updated vector tiles based on the diff\footnote{\url{http://wiki.openstreetmap.org/wiki/Planet.osm/diffs}} files.
+A big request of the Swiss OSM community was to provide updated vector tiles based on the diff\cite{103_wiki.openstreetmap.org_2015} files.
+This also requires detecting dirty tiles in the already rendered vector tiles because one update can affect multiple tiles across multiple zoom levels.
 
 \paragraph{Faster Tile Server}
 There is no robust and scalable raster tile server based on vector tiles available yet.

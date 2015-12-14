@@ -14,7 +14,7 @@ In the export phase a data style is applied to the database to produce vector ti
 %\marginpar{The section \hyperref[data_style]{\emph{Data Style}} provides more details.}
 The data style is a description of the vector tile structure and the SQL queries to fetch the data.
 
-\begin{figure}[h]
+\begin{figure}[H]
   \centering
   \includegraphics[scale=0.6]{images/vector_tile_rendering_squashed.png}
   \caption{Vector Tile Rendering Process}
@@ -30,9 +30,9 @@ The visual style defines how a feature class such as landuse actually gets displ
 
 \subsection{Raster Tile Server}
 
-The raster tile server makes it possible to display the vector tiles. It takes the visual style (CartoCSS\footnote{\url{https://github.com/mapbox/carto/blob/master/docs/latest.md}}) and the vector tiles as input. The renderer generates raster tiles of these inputs. When a raster tile is rendered, it is served by the webserver. Any GIS Software which supports raster tiles can consume the raster tiles served by the server.
+The raster tile server makes it possible to display the vector tiles. It takes a visual style like CartoCSS\cite{3_github_2014} and the vector tiles as input. The renderer generates raster tiles of these inputs. When a raster tile is rendered, it is served by the webserver. Any GIS Software which supports raster tiles can consume the raster tiles served by the server.
 
-\begin{figure}[h]
+\begin{figure}[H]
 
   \centering
   \includegraphics[width=1\textwidth]{images/raster_tile_server.png}
@@ -43,7 +43,7 @@ The raster tile server makes it possible to display the vector tiles. It takes t
 
 The vector tile server in contrast to the raster tile variant directly serves the vector tiles to the client. The raster tiles are rendered on the client side using visual style. The advantage of this approach is more control over the user experience and that less server computing power is needed.
 
-\begin{figure}[h]
+\begin{figure}[H]
 
   \centering
   \includegraphics[width=1\textwidth]{images/vector_tile_server.png}

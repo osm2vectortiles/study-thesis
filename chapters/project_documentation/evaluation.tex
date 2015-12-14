@@ -2,16 +2,15 @@
 
 \section{Spatial Database}\label{spatial_database}
 
-The OSM wiki\footnote{\url{http://wiki.openstreetmap.org/wiki/Databases_and_data_access_APIs\#Database_Schemas}} recommends PostgreSQL with the PostGIS extension for processing the data. There also exists a method\footnote{\url{https://github.com/systemed/tilemaker}} that circumvents using a database and directly transform OSM data into vector tiles but this does not scale for global vector tile coverage and does not support mixing additional data into the vector tiles.
+The OSM wiki\cite{1_wiki.openstreetmap.org_2015} recommends PostgreSQL with the PostGIS extension for processing the data. There also exists a method\cite{2_github_2015} that circumvents using a database and directly transform OSM data into vector tiles but this does not scale for global vector tile coverage and does not support mixing additional data into the vector tiles.
 
-\\
 \begin{tcolorbox}[arc=0mm,boxrule=1pt,title=Decision]\label{spatial_db_decision}
 PostGIS was the only viable choice due to superb tooling support for OSM data and
 advanced spatial query capabilities.
 \end{tcolorbox}
 
 \section{OSM Import Tool}\label{osm_import_tool}
-As import tool the OSM community recommends imposm\footnote{\url{http://imposm.org/}} or osm2pgsql\footnote{\url{http://wiki.openstreetmap.org/wiki/Osm2pgsql}}.
+As import tool the OSM community recommends imposm\cite{3_imposm.org_2015} or osm2pgsql\cite{4_wiki.openstreetmap.org_2015}.
 In this section the two tools are compared with each other.
 
 \subsection{Criterias}\label{criterias}
@@ -26,7 +25,7 @@ Customizing a schema to already split up features into separate tables
 makes querying more performant and easier to do.
 
 \paragraph{Diff Updates}
-It must be possible to apply the Planet diffs \footnote{\url{http://wiki.openstreetmap.org/wiki/Planet.osm/diffs}} 
+It must be possible to apply the Planet diffs \cite{5_wiki.openstreetmap.org_2015}
 to continuously update the database with newer data.
 \\
 If a import is very fast it is also possible to simply reimport the latest
@@ -57,28 +56,27 @@ from other data style projects available.
 
 \subsection{osm2pgsql}\label{osm2pgsql_importer}
 
-osm2pgsql\footnote{\url{http://wiki.openstreetmap.org/wiki/Osm2pgsql}} is the
+osm2pgsql\cite{4_wiki.openstreetmap.org_2015} is the
 most commonly used import tool for processing raw OpenStreetMap data into PostGIS.
 The import schema is also called osm2pgsql and defines a very
 simple schema(line, point, polygon and
-roads)\footnote{\url{http://wiki.openstreetmap.org/wiki/Osm2pgsql/schema}}.
+roads)\cite{6_wiki.openstreetmap.org_2015}.
 This results in very large tables, so it is recommended to create good
 indices. Osm2pgsql supports updating of the database, if the values have
-been stored as hstore. The schema can be adapted via the import style \footnote{\url{http://wiki.openstreetmap.org/wiki/Osm2pgsql\#Import_style}}
-but most projects use the default style\footnote{\url{https://github.com/openstreetmap/osm2pgsql/blob/master/default.style}} provided by osm2pgsql.
+been stored as hstore. The schema can be adapted via the import style \cite{7_wiki.openstreetmap.org_2015}
+but most projects use the default style\cite{8_github_2015} provided by osm2pgsql.
 
 \subsubsection{imposm3}\label{imposm-importer}
 
 Imposm is an import tool for OSM data, it is not a schema. But it
 defines a default
-schema\footnote{\url{http://imposm.org/docs/imposm/latest/database_schema.html}},
+schema\cite{9_imposm.org_2015},
 which could possibly be changed by provinding a custom mapping file. An
 advantage of the default schema is that it groups data thematically into
 tables. Which results in smaller tables and simpler queries. Imposm 3
 supports updating the database from OSM diff
-files\footnote{\url{http://imposm.org/docs/imposm3/latest/tutorial.html\#diff}}
+files\cite{10_imposm.org_2015}
 
-\\ 
 \begin{tcolorbox}[arc=0mm,boxrule=1pt,title=Decision]\label{osm_import_tool_decision}
 For the use case of this thesis it is important, that the import is efficent and that
 the import tool supports updating based on OSM diff files. Imposm3 is
@@ -93,12 +91,12 @@ Vector tiles are a broad term. In this thesis vector tiles correspond to Mapbox 
 
 When Mapbox introduced it's geography tool Mapbox Studio in 2013 they
 created the \emph{Mapbox Vector Tiles Specification}
-\footnote{\url{https://github.com/mapbox/vector-tile-spec}} which is
+\cite{4_github_2015} which is
 implemented by a variety of tools and clients
-\footnote{\url{https://github.com/mapbox/awesome-vector-tiles}}
+\cite{11_github_2015}
 including \emph{Mapbox GL JS}, \emph{Open Layers 3}, \emph{Leaflet},
 \emph{Mapzen Tangram} and Esri
-\footnote{\url{https://www.mapbox.com/blog/vector-tile-adoption/}} in
+\cite{12_springmeyer_2015} in
 the future.
 
 \paragraph{Geopackage}
@@ -113,7 +111,7 @@ Google Maps is using vector tiles since 2010 under the hood and was the
 first provider implementing this. Styling is limited and the format
 proprietary.
 
-\\
+
 \begin{tcolorbox}[arc=0mm,boxrule=1pt,title=Decision]\label{vector_tile_spec_impl_decision}
 Because one of the main requirements of this project was to provide Mapbox Streets compatible vector tiles and Mapbox provides very good tools to handle vector tiles, there was no other choice than going with Mapbox's implementation of vector tiles.
 \end{tcolorbox}
@@ -127,7 +125,7 @@ there is no typical setup method of a raster tile server using vector tiles unde
 
 \subsection{Tessera}\label{tessera}
 
-Tessera\footnote{\url{https://github.com/mojodna/tessera}} is a Node.js\footnote{\url{https://nodejs.org/en/}} webserver, which s using Mapbox tilelive\footnote{\url{https://github.com/mapbox/tilelive}} modules to read vector tiles and generates raster tiles.
+Tessera\cite{13_github_2015} is a Node.js\cite{14_foundation_2015} webserver, which s using Mapbox tilelive\cite{15_github_2015} modules to read vector tiles and generates raster tiles.
 
 \begin{figure}[H]
 \centering
@@ -167,7 +165,7 @@ With 50 concurrent users tessera was still able to respond to all requests in le
 
 \subsection{OpenStreetMap "Standard" Tile Server}\label{osm_standard_tile_server}
 
-A proven set up for generating raster tiles directly from PostgreSQL with Mapnik consists of an Apache webserver and a custom Apache module mod\_tile\footnote{\url{http://wiki.openstreetmap.org/wiki/Mod_tile}}. This approach was around before vector tiles were proposed.
+A proven set up for generating raster tiles directly from PostgreSQL with Mapnik consists of an Apache webserver and a custom Apache module mod\_tile\cite{16_wiki.openstreetmap.org_2015}. This approach was around before vector tiles were proposed.
 
 \begin{figure}[H]
 \centering
@@ -178,7 +176,6 @@ A proven set up for generating raster tiles directly from PostgreSQL with Mapnik
 It is theoretically possible to implement a raster tile server
 on top of Mapnik and renderd using C++. Instead of using a spatial database as source for the rendered raster tiles a datasource binding would need to be implemented to read the vector tiles and hand them over to the Mapnik renderer. 
 
-\\
 \begin{tcolorbox}[arc=0mm,boxrule=1pt,title=Decision]\label{tile_server_decision}
 The plan was to perform the load test on each version of the vector tile server and then make the decision based on the results. Due to the fact, that the test results of tessera where good enough for the thesis use case and it didn't take much time to implement, it was decided to use tessera as raster tile server.
 If somebody needs a high-performance tile server, one should probably think about the second variant.
