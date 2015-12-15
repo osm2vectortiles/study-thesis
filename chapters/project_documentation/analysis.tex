@@ -11,7 +11,6 @@ The data style depends on the database schema defined by the \texttt{import}.
 Along the way many additional development \texttt{tooling} was needed for the reverse engineering process and for improving developer productivity. Everything that is not needed during
 the workflow but only for development or verification is in this package.
 \\\\
-
 The infrastructure package contains specially configured programs as Docker images.
 It contains a PostGIS database, a connection pooler (pgbouncer) and a tessera based raster tile server.
 
@@ -112,8 +111,7 @@ are part of the ETL process to import data into the database.
   \item \texttt{update-scaleranks} depends on already imported data from Natural Earth and OSM to be able to update OSM places with scaleranks from Natural Earth.
 \end{itemize}
 
-The data container pattern\cite{2_container42.com_2015} is used in \texttt{cache} and \texttt{pgdata}. \\
-The data only containers are mounted from \texttt{import-osm} for storing cache data while importing and in \texttt{postgis} for storing the database files.
+The data container pattern\cite{2_container42.com_2015} is used in \texttt{cache} and \texttt{pgdata}. The data only containers are mounted from \texttt{import-osm} for storing cache data while importing and in \texttt{postgis} for storing the database files.
 
 \begin{figure}[H]
 \centering

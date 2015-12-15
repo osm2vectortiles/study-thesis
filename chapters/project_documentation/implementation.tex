@@ -247,7 +247,7 @@ is created and a clustered geohashed index of the extens of a geometry\cite{88_p
 \section{Data Style}\label{data_style}
 
 The data style is a description of all the feature classes such as landuse, water or roads. This description was invented by Mapbox.
-\\
+\\\\
 The format of a data style looks like this:
 \begin{yamlcode}
 _prefs: 
@@ -306,7 +306,7 @@ fields:
 properties:
     "buffer-size": 4
 \end{yamlcode}
-The layer definition consist of the id (layername), datasource, fields and the properties. The datasource in this case defines how the postgis database can be accessed and which sql query needs to be executed. But the datasource could also be a geojson, shapefile, sqlite database, geotiff, kml, gpx or csv file.
+The layer definition consist of the id (layername), datasource, fields and the properties. The data source in this case defines how the postgis database can be accessed and which sql query needs to be executed. Alternative data sources could a geojson, shapefile, sqlite database, geotiff, kml, gpx or csv file.
 
 \subsubsection{Buffers}\label{buffers}
 The buffer value on a layer defines how many pixels around each tile will be included. It is necessary to ensure correct rendering across tile boundaries. This value is individual for each layer and depends on the type of data. Buffers for layers containing labels should have a large buffer size such as 128 pixels, whereas a layer like landuse does only need a buffers size of 4 pixels. In general, the buffer size should be set to the minimum to keep the size of the vector tiles as low as possible.\cite{89_mapbox.com_2015}
@@ -377,9 +377,9 @@ The sections below describe the tools and methods that were used to achieve the 
 \subsection{Vector Tile Format}\label{vector_tile_format}
 To better understand what the vector tile compare tool does, a high level introduction to the vector tiles format will be given below.
 \\\\
-A vector tile can consist of one or more named layers and containing one or more features. A feature consist of attributes and a geometry (point, linestring or polygon). Attributes are represented as a dictionary of key, value pairs. 
+A vector tile can consist of one or more named layers and containing one or more features\cite{4_github_2015}. A feature consist of attributes and a geometry (point, linestring or polygon). Attributes are represented as a dictionary of key, value pairs.
 \\\\
-Below you can find an example vector tile, which has two layers water and admin. The water layer has the attribute key "osm\_id" and value 0. If you would compare this example with the specification\cite{4_github_2015}, one could think this is not a specification conform vector tile. The example below is a compressed vector tile. More information on what compression methods are applied can be found in the specification.
+Below you can find an example vector tile, which has two layers water and admin. The water layer has the attribute key "osm\_id" and value 0. If you would compare this example with the specification\cite{4_github_2015}, one could think this is not a specification conform vector tile. The example below is a compressed vector tile. More information on what compression methods are applied can be found in the specification.\\
 
 Mapbox Streets v6 vector tile(0/0/0):
 \begin{jsoncode}
@@ -418,7 +418,7 @@ Mapbox Streets v6 vector tile(0/0/0):
 \end{jsoncode}
 
 \section{Quality Assurance Tools}\label{tools}
-During the prototyping phase it was realized, that tools need to be built to help the contributors track the progress of Mapbox Streets compatibility.
+During the prototyping phase a number of quality assurance tools were built to help the contributors track the progress of Mapbox Streets compatibility.
 
 \subsection{Vector Tile Compare}\label{vector_tile_compare}
 The Vector Tile Compare tool analyzes vector tiles and outputs interesting information like layers and attributes. 
@@ -431,7 +431,7 @@ The results where then uploaded  to a Github repository and the branch compare f
   \caption{Compare of Mapbox Streets v6 and Open Streets on 31.10.2015}
 \end{figure}
 
-This gave us a good indicator of which layers are shown on which zoom level and what attributes are contained in a layer.
+This resulted in a indicator of which layers are shown on which zoom level and what attributes are contained in a layer.
 
 \subsection{Visual Compare}\label{visual_compare}
 The vector tile comparison was good to ensure that exactly the same data is present on the same zoom level as Mapbox Streets.
@@ -448,7 +448,7 @@ The figure above shows a screenshot of the Visual Compare tool. On the left side
 
 \section{Improvement Process}
 
-This section describes what we did, when we found a visual difference. When we identified a visual difference with the Vector Compare or Visual Compare tool, we first checked if the missing data is included in our import mapping. If this was not the case, we used the TagFinder tool\cite{93_wiki.openstreetmap.org_2015} to find the right OSM key, value pair of the missing item. Next we included the key, value pair into our import mapping and re-imported the OSM data. To see the item on the map, the SQL query in the data style needs to be altered to fetch the added item. Now the missing item should appear on the map. During this process we used mostly Mapbox Studio Classic\cite{mapbox_studio_classic} as the map can be rendered on the fly after the query has been altered.
+This section describes the improvement process, when a visual difference was found. When a visual difference was identified with the Vector Compare or Visual Compare tool, the contributors checked if the missing data is included in the import mapping. If this was not the case, the TagFinder tool\cite{93_wiki.openstreetmap.org_2015} was used to find the right OSM key, value pair of the missing item. Next the key, value pair was included into the import mapping and re-imported the OSM data. To see the item on the map, the SQL query in the data style needs to be altered to fetch the added item. Now the missing item should appear on the map. During this process mostly Mapbox Studio Classic\cite{mapbox_studio_classic} was used as the map can be rendered on the fly after the query has been altered.
 
 \section{Limitations}\label{project_limitations}
 
