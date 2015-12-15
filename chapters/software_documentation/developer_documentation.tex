@@ -1,0 +1,438 @@
+\chapter{Developer Documentation}
+
+\section{Create your own vector tiles}\label{create-your-own-vector-tiles}
+
+We use Docker extensively for development and deployment. The easiest
+way to get started is using
+\href{https://www.docker.com/docker-compose}{Docker Compose}.
+
+1. Step: Clone the osm2vectortiles project.
+
+\begin{bashcode}
+git clone https://github.com/osm2vectortiles/osm2vectortiles.git
+\end{bashcode}
+
+2. Step: Start up your PostGIS container with the data container attached.
+
+\begin{bashcode}
+docker-compose up -d postgis
+\end{bashcode}
+
+3. Step: Download a PBF and put it into the local \texttt{import} directory.
+
+\begin{bashcode}
+wget https://s3.amazonaws.com/metro-extracts.mapzen.com/zurich_switzerland.osm.pbf
+\end{bashcode}
+
+4. Step: Now you need to import the PBF files into PostGIS.
+
+\begin{bashcode}
+docker-compose up import-osm
+\end{bashcode}
+
+5. Step: Now you need to import several external data sources.
+
+Import water polygons from
+\href{http://openstreetmapdata.com/data/water-polygons}{OpenStreetMapData.com}.
+
+\begin{bashcode}
+docker-compose up import-water
+\end{bashcode}
+
+6. Step: Import Natural Earth data for lower zoom levels.
+
+\begin{bashcode}
+docker-compose up import-natural-earth
+\end{bashcode}
+
+7. Step: Import custom country, sea and state labels.
+
+\begin{bashcode}
+docker-compose up import-labels
+\end{bashcode}
+
+8. Step: Now import custom SQL functions.
+
+\begin{bashcode}
+docker-compose up import-sql
+\end{bashcode}
+
+9. Step: Update the scaleranks of OSM places.
+
+\begin{bashcode}
+docker-compose up update-scaleranks
+\end{bashcode}
+
+10. Step: Export the data as MBTiles file to the \texttt{export} directory.
+
+\begin{bashcode}
+docker-compose up export
+\end{bashcode}
+
+11. Step: Serve the tiles as raster tiles from \texttt{export} directory.
+
+\begin{bashcode}
+docker-compose up serve
+\end{bashcode}
+
+
+
+\section{Create own extract}\label{create-own-extract}
+
+If you need an extract which is not included on the
+\href{http://osm2vectortiles.org/data/download.html}{downloads page},
+you can simply download the planet file and make your own extract.
+
+\subsection{Preparation}\label{preparation}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\item
+  \href{http://osm2vectortiles.org/data/download.html}{Download} the
+  planet file.
+\item
+  \href{http://tools.geofabrik.de/calc/\#type=geofabrik_standard\&bbox=5.538062,47.236312,15.371071,54.954937\&tab=1\&proj=EPSG:4326\&places=2}{Get
+  bounding box} of your desired extract.
+\item
+  Install tilelive utility.
+
+\begin{bashcode}
+npm install -g tilelive
+\end{bashcode}
+\end{enumerate}
+
+\subsection{Create Extract}\label{create-extract}
+
+To create an extract the tilelive-copy utility is used. It takes a
+bounding box and a mbtiles file as input and ouputs the extract.
+
+Replace the bounding box in the following command with your bounding
+box.
+
+\begin{bashcode}
+tilelive-copy --minzoom=0 --maxzoom=14 --bounds="60.403889,29.288333,74.989862,38.5899217" 
+world.mbtiles switzerland.mbtiles
+\end{bashcode}
+\newpage
+
+\section{Layer Reference}\label{layer-reference}
+
+This is a guide to the data inside the OSM Vector Tiles to help you with
+styling.
+
+Available layers:
+
+\begin{itemize}
+\item
+  landuse
+\item
+  waterway
+\item
+  water
+\item
+  aeroway
+\item
+  barrier\_line
+\item
+  building
+\item
+  landuse\_overlay
+\item
+  tunnel
+\item
+  road
+\item
+  bridge
+\item
+  admin
+\item
+  country\_label
+\item
+  marine\_label
+\item
+  place\_label
+\item
+  water\_label
+\item
+  poi\_label
+\item
+  road\_label
+\item
+  waterway\_label
+\item
+  housenum\_label
+\end{itemize}
+
+\subsection*{Zoom Level Reference}\label{zoom-level-reference}
+
+The zoom level reference helps to see which layer is included on which
+zoom level. The zoom levels are ordered by how they get drawn. The layer
+landuse is at the bottom and housenum\_label is at top of all the
+others.
+
+\begin{table}[H]
+\centering
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{l|ccccccccccccccc}
+ & \multicolumn{1}{l}{z0} & \multicolumn{1}{l}{z1} & \multicolumn{1}{l}{z2} & \multicolumn{1}{l}{z3} & \multicolumn{1}{l}{z4} & \multicolumn{1}{l}{z5} & \multicolumn{1}{l}{z6} & \multicolumn{1}{l}{z7} & \multicolumn{1}{l}{z8} & \multicolumn{1}{l}{z9} & \multicolumn{1}{l}{z10} & \multicolumn{1}{l}{z11} & \multicolumn{1}{l}{z12} & \multicolumn{1}{l}{z13} & \multicolumn{1}{l}{z14} \\ \hline
+landuse &  &  &  &  &  & x & x & x & x & x & x & x & x & x & x \\
+waterway &  &  &  &  &  &  &  &  & x & x & x & x & x & x & x \\
+water & x & x & x & x & x & x & x & x & x & x & x & x & x & x & x \\
+aeroway &  &  &  &  &  &  &  &  &  &  &  &  & x & x & x \\
+barrier\_line &  &  &  &  &  &  &  &  &  &  &  &  &  &  & x \\
+building &  &  &  &  &  &  &  &  &  &  &  &  &  & x & x \\
+landuse\_overlay &  &  &  &  &  &  &  & x & x & x & x & x & x & x & x \\
+tunnel &  &  &  &  &  &  &  &  &  &  &  & x & x & x & x \\
+road &  &  &  &  &  & x & x & x & x & x & x & x & x & x & x \\
+bridge &  &  &  &  &  &  &  &  &  &  &  &  & x & x & x \\
+admin & x & x & x & x & x & x & x & x & x & x & x & x & x & x & x \\
+country\_label &  & x & x & x & x & x & x & x & x & x & x & x & x & x & x \\
+marine\_label &  & x & x & x & x & x & x & x & x & x & x & x & x & x & x \\
+state\_label &  &  &  &  & x & x & x & x & x & x & x & x & x & x & x \\
+place\_label &  &  &  &  & x & x & x & x & x & x & x & x & x & x & x \\
+water\_label &  &  &  &  &  &  &  &  &  &  & x & x & x & x & x \\
+poi\_label &  &  &  &  &  &  &  &  &  &  &  &  &  &  & x \\
+road\_label &  &  &  &  &  &  &  &  & x & x & x & x & x & x & x \\
+waterway\_label &  &  &  &  &  &  &  &  & x & x & x & x & x & x & x \\
+housenum\_label &  &  &  &  &  &  &  &  &  &  &  &  &  &  & x
+\end{tabular}
+}
+\end{table}
+
+\subsection*{landuse}\label{landuse}
+
+This layer includes polygons representing both land-use and land-cover.
+
+It's common for many different types of landuse/landcover to be
+overlapping, so the polygons in this layer are ordered by the area of
+their geometries to ensure smaller objects will not be obscured by
+larger ones. Pay attention to use of transparency when styling - the
+overlapping shapes can cause muddied or unexpected colors.
+
+\subsection*{water}\label{water}
+
+This is a simple polygon layer with no differentiating types or classes.
+Water bodies are filtered and simplified according to scale - only
+oceans and very large lakes are shown at the lowest zoom levels, while
+smaller and smaller lakes and ponds appear as you zoom in.
+
+\subsection*{waterway}\label{waterway}
+
+The waterway layer contains rivers, streams, canals, etc represented as
+lines.
+
+\subsubsection*{Types}\label{types}
+
+The \texttt{type} column can contain one of the following types:
+
+\begin{itemize}
+\item
+  \texttt{ditch}
+\item
+  \texttt{stream}
+\item
+  \texttt{stream\_intermittent}
+\item
+  \texttt{river}
+\item
+  \texttt{canal}
+\item
+  \texttt{drain}
+\item
+  \texttt{ditch}
+\end{itemize}
+
+\subsection*{aeroway}\label{aeroway}
+
+The aeroway layer contains the types runway, taxiway, apron and helipad.
+
+\subsection*{barrier\_line}\label{barrierux5fline}
+
+The barrier\_line layer contains the classes fence, cliff, gate.
+
+\subsection*{building}\label{building}
+
+This layer contains buildings. Buildings are shown starting zoom level
+13.
+
+\subsection*{landuse\_overlay}\label{landuseux5foverlay}
+
+This layer is for landuse polygons that should be drawn above the
+\#water layer.
+
+\subsection*{tunnel road bridge}\label{tunnel-road-bridge}
+
+The layers tunnel and bridge are based of the layer road.
+
+\subsubsection*{Classes}\label{classes}
+
+The main field used for styling the tunnel, road, and bridge layers is class.
+
+\begin{table}[H]
+\label{my-label}
+\begin{tabular}{p{3cm} | p{8cm}}
+Class           & Aggregated Types                                                                                                              \\ \hline
+motorway        & motorway                                                                                                                      \\
+motorway\_link  & motorway\_link                                                                                                                \\
+driveway        & driveway                                                                                                                      \\
+main            & primary, primary\_link, trunk, trunk\_link, secondary, secondary\_link, tertiary, tertiary\_link                              \\
+street          & residential, unclassified, living\_street, road, raceway                                                                      \\
+street\_limited & pedestrian, construction, private                                                                                             \\
+service         & service, track, alley. spur, siding, crossover                                                                                \\
+path            & path, cycleway, ski, steps, bridleway, footway                                                                                \\
+major\_rail     & rail, monorail, narrow\_gauge, subway                                                                                         \\
+aerialway       & chair\_lift, mixed\_lift, drag\_lift, platter, t-bar, magic\_carpet, gondola, cable\_car, rope\_tow, zip\_line, j-bar, canopy \\
+golf            & hole                                                                                                                          \\
+                &                                                                                                                              
+\end{tabular}
+\end{table}
+
+\subsection*{admin}\label{admin}
+
+This layer contains the administrative boundary lines. These are based
+on Natural Earth data on lower zoom levels (0-6) and OSM data (7-14) on
+upper zoom levels.
+
+\subsubsection*{Administrative Level}\label{administrative-level}
+
+\begin{table}[H]
+\label{my-label}
+\begin{tabular}{l | l}
+Value & Aggregated Types  \\ \hline
+2     & countries         \\
+4     & states, provinces
+\end{tabular}
+\end{table}
+
+\subsubsection*{Disputes}\label{disputes}
+
+The disputed field should be used to apply a dashed or otherwise
+distinct style to disputed boundaries. No single map of the world will
+ever keep everybody happy, but acknowledging disputes where they exist
+is an important aspect of good cartography.
+
+\subsubsection*{Maritime boundaries}\label{maritime-boundaries}
+
+The maritime field can be used as a filter to downplay or hide maritime
+boundaries, which are often not shown on maps.
+
+\subsection*{country\_label}\label{country_label}
+
+The country\_label layer contains the labels of all countries with
+translated names.
+
+\subsubsection*{Scalerank}\label{scalerank}
+
+The scalerank field is used to hide or show the label based on the
+importance, size and available room.
+
+\subsection*{marine\_label}\label{marine_label}
+
+The marine\_label layer contains labels for marine features such as
+oceans, seas, large lakes and bays.
+
+\subsubsection*{Labelrank}\label{labelrank}
+
+The labelrank is used to hide or show the label based on the importance,
+size and available room.
+
+\subsection*{state\_label}\label{state_label}
+
+The layer state\_label contains labels for large provinces in large
+countries such as China, USA, Russia, Australia and UK.
+
+\subsection*{place\_label}\label{place_label}
+
+The layer place\_label contains labels for cities.
+
+\subsubsection*{Scalerank}\label{scalerank-1}
+
+The scalerank is used to hide or show the label based on the importance,
+size and available room.
+
+\subsubsection*{Localrank}\label{localrank}
+
+The localrank field can be used to adjust the label density by showing
+fewer labels.
+
+\subsection*{water\_label}\label{water_label}
+
+The layer water\_label contains labels for bodies of water such as
+lakes.
+
+\subsection*{road\_label}\label{road_label}
+
+The layer road\_label uses the same classification as the layer road.
+
+\subsection*{waterway\_label}\label{waterway_label}
+
+The layer waterway\_label contains labels for rivers.
+
+\subsection*{housenum\_label}\label{housenum_label}
+
+This layer contains points used to label the street number parts of
+specific addresses. Both housenumber polygons and points were mapped to
+a single layer.
+
+The house\_num field countains house and building numbers.
+
+\subsection*{poi\_label}\label{poi_label}
+
+The poi\_label layer is used to place icons and labels for various point
+of interests.
+
+\subsubsection*{Names}\label{names}
+
+Names are available in all languages (name, name\_en, name\_de,
+name\_fr, name\_es, name\_ru, name\_zh).
+
+\subsubsection*{Scalerank}\label{scalerank}
+
+\begin{table}[H]
+\label{my-label}
+\begin{tabular}{l | l}
+Scalerank & Description                                       \\ \hline
+1         & The POI has a very large area \textgreater145000  \\
+2         & The POI has a medium-large area \textgreater12780 \\
+3         & The POI has a small area 2960 or is a station     \\
+4         & The POI has no known area                        
+\end{tabular}
+\end{table}
+
+\subsubsection*{Localrank}\label{localrank}
+
+The localrank field can be used to adjust the label density by showing
+fewer labels. The localrank is a whole number which starts at 1 and
+groups places in a grid by their importance.
+
+Importance of POIs are weighted in the following order:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\item
+  station, subway\_entrance, park, cemetery, bank, supermarket, car,
+  library, university, college, police, townhall, courthouse
+\item
+  nature\_reserve, garden, public\_building
+\item
+  stadium
+\item
+  hospital
+\item
+  zoo
+\item
+  university, school, college, kindergarten
+\item
+  supermarket, department\_store
+\item
+  nature\_reserve, swimming\_area
+\item
+  attraction
+\end{enumerate}
+
+\subsubsection*{Maki Labels and Types}\label{maki-labels-and-types}
+
+The type field in the poi\_label layer is mapped to the appropriate Maki
+label which can be queried in maki. Types are stored in a human readable
+format in the data where chair\_lift becomes Chair lift so you can use
+the type field for as label.
