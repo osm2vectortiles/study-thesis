@@ -1,16 +1,12 @@
 \chapter{Implementation}\label{implementation}
 
-The most promising vector tile specification was proposed by Mapbox.
-%\marginpar{The Mapbox Vector Tile Specification is compared with other vector tile formats in chapter \ref{vector-tile-formats}}
-They provide many open source tools to manage vector tiles. Instead of implementing existing tools and approaches as many existing tools
-as possible were used to speed up development.
-Because of this the implementation consists mostly of docker containers which do a specific task.
+The implementation chapter explains the aspects of the different solutions in greater detail.
 
 \section{Mapping}
 
-Imposm 3 requires a custom mapping file to decide which tags and geometries are mapped into which table.
+Imposm3 requires a custom mapping file to decide which tags and geometries are mapped into which table.
 
-The example data mapping\cite{81_imposm.org_2015} defines that geometries of type polygon with the key value pairs \texttt{natural=wood}, \texttt{natural=land} and \texttt{tourism=zoo} should be mappend into the \texttt{landusages} table.
+The example data mapping\cite{81_imposm.org_2015} below defines that geometries of the type polygon with the key value pairs \texttt{natural=wood}, \texttt{natural=land} and \texttt{tourism=zoo} should be mappend into the \texttt{landusages} table.
 
 \begin{yamlcode}
 tables:
@@ -21,7 +17,8 @@ tables:
        tourism: [zoo]
 \end{yamlcode}
 
-Instead of mapping all values of a certain key a explicit mapping strategy has been chosen. Each tag was explicitly defined in the mapping. This required mapping a lot of tags (to map all sport POIs over 79 tags are mapped) but has the benefit of knowing exactly which tags are in the database which makes querying and filtering easier.
+Instead of mapping all values of a certain key an explicit mapping strategy has been chosen.\\
+Each tag was explicitly defined in the mapping. This brings the benefit of knowing exactly what tags are in the database which makes querying and filtering easier.
 
 \begin{figure}[H]
 \centering
@@ -35,11 +32,11 @@ Instead of mapping all values of a certain key a explicit mapping strategy has b
 This section describes the implementation details of the database schema.
 
 \subsection{OSM id}
-All tables and views that are derived from \osm{} data has the original id\cite{82_wiki.openstreetmap.org_2015}
+All tables and views that are derived from \osm{} data have the original id\cite{82_wiki.openstreetmap.org_2015}
 to trace back the data and be able to query a distinct \osm{} feature in a visual style.
 
 \subsection{Translations}
-All features which are label layers will contain several translations.
+All label features contain several translations.
 The translations are directly mapped from the suffixed language code \cite{83_wiki.openstreetmap.org_2015}. If a field is not available in the language, the local name is used.
 
 \begin{table}[H]
@@ -60,18 +57,17 @@ The translations are directly mapped from the suffixed language code \cite{83_wi
 \end{table}
 
 \subsection{Type and Class}
-The class can be explained as a feature class. It is a categorization of an OSM value.
-The type is the OSM value of the feature.
+The \texttt{class} field is equivalent to the feature class while the \texttt{type} field is the OSM value of the feature.
+\newpage
 
 \section{Classification}
 \label{classification}
 
-The OpenStreetMap tagging schema has developed into a complex taxonomy of real-world feature classes and objects. \cite[p. 15]{haklay2008openstreetmap}. Map designers don't want to design
-for each distinct object specifically which is why Mapbox and others abstract distinct key value pairs into so called feature classes. Mapbox calls those feature class simply class. Mapping created key value pairs into categories, cannot be automated
-and there is no standard. This is why this is done by hand.
-\\
-A map designer that wants to style agricultural areas does not care
-what type of field it is.
+The \osm{} tagging schema has developed into a complex taxonomy of real-world feature classes and objects. \cite[p. 15]{haklay2008openstreetmap}.
+Map designers don't want to design
+for each tag specifically which is why Mapbox and other providers abstract distinct tags into feature classes. 
+For example a map designer that wants to style agricultural areas does not care what type of field it is.
+Mapping tags into categories cannot be automated and there is no standard defined: therefore the mapping is handmade.
 
 \begin{table}[H]
 \centering
@@ -91,9 +87,12 @@ what type of field it is.
 
 \subsection{Classification Format}
 
-The classicifcations are written in a YAML based format.
-Where each key in \texttt{classifications} denotes the classification name. The elements within each classification (e.g. \texttt{driveway} or \texttt{main} are the class name and the values below the class name (e.g. \texttt{primary}, \texttt{primary\_link} the OSM values to match.
-The OSM keys are not matched explicitly - only the values.
+The classicifcations are written in a YAML based format
+where each key in \texttt{classifications} denotes the classification name.
+The keys within each classification (e.g. \texttt{driveway}, \texttt{main}) contain the class name.
+The values in each class name (e.g. \texttt{primary}, \texttt{primary\_link} represent the OSM values that need to be matched.
+Only the value of a OSM tag is taken into account for deciding the feature class. The key
+of the tag is not matched.
 
 \begin{yamlcode}
 classifications:
@@ -112,13 +111,15 @@ classifications:
     - tertiary
     - tertiary_link
 \end{yamlcode}
+\newpage
 
 \subsection{Code Generation}
 
-The readable classification format is taken and immutable SQL functions are generated
-from the YAML source. These functions can then be used in the layer queres.
+The \texttt{generate\_sql.py} script reads the classification format and generates
+immutable SQL functions from the YAML source.
+These functions can then be used in the layer queries.
 
-The example above will result in the following function.
+The example in the above listing will result in the following function.
 
 \begin{sqlcode}
 CREATE OR REPLACE FUNCTION classify_road(type VARCHAR)
@@ -145,6 +146,7 @@ SELECT
   type AS type
 FROM osm_roads
 \end{sqlcode}
+\newpage
 
 \section{Relative Importance}
 \label{localrank}
@@ -156,8 +158,7 @@ important a label is compared to the labels in its neighbourhood.
 
 \subsubsection{Order Features by their Types}
 
-In the best case scenario a function would rank each point of interest class but
-due to the limited time only the most important features were explicitly ranked.
+In the best case scenario a function would rank each point of interest class. Due to the limited time only the most important features were explicitly ranked.
 
 \begin{sqlcode}
 CREATE OR REPLACE FUNCTION localrank_poi(type VARCHAR) RETURNS INTEGER
@@ -196,17 +197,18 @@ SELECT
                ORDER BY localrank_poi(type) ASC) AS localrank,
 FROM osm_poi
 \end{sqlcode}
+\newpage
 
 \section{PostgreSQL Performance}
 \label{postgres-performance}
 
-The most intensive work is done on the database side to respond to all SQL queries made by Mapnik in the fastest way possible.
+Most of the heavywork is done on the database side to respond to all SQL queries made by Mapnik in the fastest way possible.
 
 \subsection{Tuning}
 
-The PostgreSQL default parameters do not deliver good performance for stronger machines\cite{84_wiki.postgresql.org_2015}
-For the different database machines PgTune\cite{85_pgtune.leopard.in.ua_2015} calculator has been used to determine good cache and buffer sizes for data warehouse style computing.
-\\
+The PostgreSQL default parameters do not deliver good performance for stronger machines.\cite{84_wiki.postgresql.org_2015}
+For the different database machines the PgTune\cite{85_pgtune.leopard.in.ua_2015} calculator has been used to determine good cache and buffer sizes for data warehouse style computing.
+\\\\
 Example configuration for a host with 50 GB of memory.
 
 \begin{bashcode}
@@ -221,7 +223,7 @@ wal_buffers = 16MB
 default_statistics_target = 500
 \end{bashcode}
 
-For speed up the import, the disabled transactional features of PostgreSQL have been disabled. \cite{86_berkus_berkus_profile_2015}.
+For speed up the import, the transactional features of PostgreSQL have been disabled. \cite{86_berkus_berkus_profile_2015}.
 
 \begin{bashcode}
 bgwriter_lru_maxpages = 0
@@ -234,8 +236,7 @@ wal_log_hints = off
 
 \subsection{Indizes}
 
-For each table a GiST\cite{87_postgresql.org_2015} index on the geometry
-is created and a clustered geohashed index of the extens of a geometry\cite{88_postgis.net_2015} to make lookups that check if a geometry is in a certain tile faster. Especially the clustered index hash helped in speeding up the queries.
+For each table a GiST\cite{87_postgresql.org_2015} index on the geometry and a clustered geohashed index was created. This helped to make lookups that check if a geometry is in a certain tile faster. Especially the clustered index hash helped in speeding up the queries.
 
 \begin{sqlcode}
 "osm_places_geom" gist (geometry)
@@ -243,6 +244,7 @@ is created and a clustered geohashed index of the extens of a geometry\cite{88_p
     st_geohash(st_transform(st_setsrid(box2d(geometry)::geometry, 3857), 4326))
 ) CLUSTER
 \end{sqlcode}
+\newpage
 
 \section{Data Style}\label{data_style}
 
@@ -263,12 +265,13 @@ center:
   - 3
 description: Open Streets
 Layer: 
-    # All layer definitions come here
+    # Layer definitions come here
 maxzoom: 14
 minzoom: 0
 name: Open Streets
 \end{yamlcode}
-The center attribute defines the default position of the map when the data style is opened with Mapbox Studio Classic. In this case the default position is set to the coordinates 21.7969, 34.6694 on zoom level 3. The layer attribute defines all the layers. A detailed description follows in the next section. The max- and minzoom attributes define the range in which vector data is available.
+
+The \texttt{center} attribute defines the default position of the map when the data style is opened with Mapbox Studio Classic. In this case the default position is set to the coordinates \texttt{21.7969, 34.6694} on zoom level 3. The \texttt{layer} attribute defines all the layers that are present in a vector tile. A detailed description follows in the next section. The max- and minzoom attributes define the range in which vector data is available.
 \newpage
 \subsection{Layer Definition}\label{layer_definition}
 A layer definition describes a view on the data. It can consist of multiple data sources. In the figure below the layer is a view and the definition of this view is a graphic definition.
@@ -306,7 +309,7 @@ fields:
 properties:
     "buffer-size": 4
 \end{yamlcode}
-The layer definition consist of the id (layername), datasource, fields and the properties. The data source in this case defines how the postgis database can be accessed and which sql query needs to be executed. Alternative data sources could a geojson, shapefile, sqlite database, geotiff, kml, gpx or csv file.
+The layer definition consist of the \texttt{id} (layername), datasource, fields and the properties. The data source in this case defines how the PostGIS database can be accessed and which SQL query needs to be executed. An alternative data source could also be a simple file (GeoJson, Shapefile, SQLite database, GeoTIFF, KML, GPX or CSV).
 
 \subsubsection{Buffers}\label{buffers}
 The buffer value on a layer defines how many pixels around each tile will be included. It is necessary to ensure correct rendering across tile boundaries. This value is individual for each layer and depends on the type of data. Buffers for layers containing labels should have a large buffer size such as 128 pixels, whereas a layer like landuse does only need a buffers size of 4 pixels. In general, the buffer size should be set to the minimum to keep the size of the vector tiles as low as possible.\cite{89_mapbox.com_2015}
@@ -320,21 +323,21 @@ The buffer value on a layer defines how many pixels around each tile will be inc
 The figure above is a good example to see the result of the buffer value. Apart from the rivers there is no other data, therefore the rivers must have a larger buffer value than the other layers.
 
 \subsubsection{Overzooming}\label{overzooming}
-The min- and maxzoom values define on which zoom levels there is data. This does not mean that it is not possible to zoom deeper in that the maxzoom value.
-Overzooming defines to term of displaying data at higher zoom levels.\cite{90_mapbox.com_2015}
-This allows us to show data on higher zoom levels, without generating vector tiles for these zoom levels.
-Mapbox has defined a rule of thumb for vector tiles. Vector tiles are useful for about 4-6 levels of overzooming. If I have a vector tile on zoom level 10, it can be stretched out up to zoom level 14 or 16.  
+The min- and maxzoom values define on which zoom levels data is available. This does not mean that it is not possible to zoom deeper than the maxzoom value.
+Overzooming defines to term of displaying data at higher zoom levels\cite{90_mapbox.com_2015}.
+This allows to show data on higher zoom levels, without generating vector tiles for these zoom levels.
+Mapbox has defined a rule of thumb for vector tiles: vector tiles are useful for about 4-6 levels of overzooming. A vector tile on zoom level 10, can be stretched out up to zoom level 14 or 16.  
 
 \subsubsection{Layer Ordering}\label{layer_ordering}
 The order in which the layer are defined in the data style is equal to the order they are stored in the vector tiles.
-The layer at the top of the layer definition will be drawn first next the second layer and so on. So the layer at the bottom is drawn on top of all the other layers.
+The layer at the top of the layer definition will be drawn first next the second layer and so on. The layer at the bottom is drawn on top of all the other layers.
 
 
 \section{Zoom Level Reference}\label{zoomlevel_reference}
-The zoom level reference helps to see which feature class is included on which zoom level. The zoom levels are ordered by how they get drawn. The feature class landuse is at the bottom and housenum\_label is on top of all the others. 
+The zoom level reference helps to see which feature class is included on which zoom level.
+The zoom levels are in the same order as they get drawn.
+The feature class \texttt{landuse} is at the bottom and \texttt{housenum\_label} is on top of all the others. 
 
-% Please add the following required packages to your document preamble:
-% \usepackage{graphicx}
 \begin{table}[H]
 \centering
 \resizebox{\textwidth}{!}{%
@@ -367,21 +370,25 @@ housenum\_label &  &  &  &  &  &  &  &  &  &  &  &  &  &  & x
 \end{table}
 
 \section{Reverse Engineering Process}\label{reverse_engineering_process}
-One of the main requirements of this project was to make our vector tiles compatible with the Mapbox Streets vector tiles\cite{22_mapbox.com_2015}.
+One of the main requirements of the project was to make the vector tiles compatible with the Mapbox Streets vector tiles\cite{22_mapbox.com_2015}.
 \\
-This requirement has not been defined since the beginning, it evolved during the construction of our first prototype.
-Therefore a lot of time has been spent making our vector tiles as similar as possible to the ones of Mapbox.
+This requirement has not been defined since the beginning, it evolved during the construction of the first prototype.
+Therefore a lot of time has been spent making the vector tiles as similar as possible to the ones of Mapbox.
 \\
 The sections below describe the tools and methods that were used to achieve the goal of Mapbox Streets compatibility.
+\newpage
 
 \subsection{Vector Tile Format}\label{vector_tile_format}
 To better understand what the vector tile compare tool does, a high level introduction to the vector tiles format will be given below.
 \\\\
-A vector tile can consist of one or more named layers and containing one or more features\cite{4_github_2015}. A feature consist of attributes and a geometry (point, linestring or polygon). Attributes are represented as a dictionary of key, value pairs.
+A vector tile can consist of one or more named layers which contain one or more features\cite{4_github_2015}.
+A feature consists of attributes and a geometry (point, linestring or polygon).
+Attributes are represented as a dictionary of key-value pairs.
 \\\\
-Below you can find an example vector tile, which has two layers water and admin. The water layer has the attribute key "osm\_id" and value 0. If you would compare this example with the specification\cite{4_github_2015}, one could think this is not a specification conform vector tile. The example below is a compressed vector tile. More information on what compression methods are applied can be found in the specification.\\
+Below is an example of a vector tile with two layers \texttt{water }and \texttt{admin}.
+The water layer has the attribute key "osm\_id" and value 0. If somebody would compare this example with the specification\cite{4_github_2015}, one could think this is not a specification conform vector tile. The example below is a compressed vector tile. More information on what compression methods are applied can be found in the specification.\\
 
-Mapbox Streets v6 vector tile(0/0/0):
+Mapbox Streets v6 vector tile for \texttt{0/0/0}.
 \begin{jsoncode}
 { 
   "layers": {
@@ -423,7 +430,7 @@ During the prototyping phase a number of quality assurance tools were built to h
 \subsection{Vector Tile Compare}\label{vector_tile_compare}
 The Vector Tile Compare tool analyzes vector tiles and outputs interesting information like layers and attributes. 
 The output was generated for the same vector tiles of Mapbox Streets and the resulting vector tiles from osm2vectortiles (Open Streets).
-The results where then uploaded  to a Github repository and the branch compare feature was used to compare them. 
+The results where then uploaded  to a GitHub repository and the branch compare feature was used to compare them. 
 
 \begin{figure}[H]
   \centering
@@ -432,6 +439,7 @@ The results where then uploaded  to a Github repository and the branch compare f
 \end{figure}
 
 This resulted in a indicator of which layers are shown on which zoom level and what attributes are contained in a layer.
+\newpage
 
 \subsection{Visual Compare}\label{visual_compare}
 The vector tile comparison was good to ensure that exactly the same data is present on the same zoom level as Mapbox Streets.
@@ -444,11 +452,23 @@ The decision was made to build a compare tool that works visually to cover up bu
   \caption{Visual Compare of Mapbox Streets and Open Streets}
 \end{figure}
 
-The figure above shows a screenshot of the Visual Compare tool. On the left side is Mapbox Streets and on the right side our Open Streets map. They both use the same visual style (OSM Bright 2\cite{92_github_2015}). When you zoom in on the right side of the map, it automatically zooms in on the left side. This tool was very helpful to find all the differences.
+The figure above shows a screenshot of the Visual Compare tool. On the left side is Mapbox Streets and on the right side our Open Streets map. They both use the same visual style (OSM Bright 2\cite{92_github_2015}). When you zoom in on the right side of the map, it will automatically zoom in on the left side. This tool was very helpful to find all the differences.
+\newpage
 
 \section{Improvement Process}
 
-This section describes the improvement process, when a visual difference was found. When a visual difference was identified with the Vector Compare or Visual Compare tool, the contributors checked if the missing data is included in the import mapping. If this was not the case, the TagFinder tool\cite{93_wiki.openstreetmap.org_2015} was used to find the right OSM key, value pair of the missing item. Next the key, value pair was included into the import mapping and re-imported the OSM data. To see the item on the map, the SQL query in the data style needs to be altered to fetch the added item. Now the missing item should appear on the map. During this process mostly Mapbox Studio Classic\cite{mapbox_studio_classic} was used as the map can be rendered on the fly after the query has been altered.
+This section describes the improvement process used to eliminate visual differences.
+
+\begin{enumerate}
+\item When a visual difference was identified with the Vector Compare or Visual Compare tool, the contributors checked if the missing data is included in the import mapping.
+\item If this was not the case, the TagFinder tool\cite{93_wiki.openstreetmap.org_2015} was used to find the right OSM key-value pair of the missing item.
+\item Next the key-value pair was included into the import mapping and the OSM data was reimported again.
+\item To see the item on the map, the SQL query in the data style needs to be altered to fetch the added item.
+\item Now the missing item should appear on the map.
+\end{enumerate}
+
+This workflow was executed within Mapbox Studio Classic\cite{mapbox_studio_classic} where
+the map can be rerendered on the fly after a query has been altered.
 
 \section{Limitations}\label{project_limitations}
 

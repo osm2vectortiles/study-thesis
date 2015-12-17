@@ -2,11 +2,17 @@
 
 \section{Software Development Process}
 
-An agile approach based on RUP has been used as the process model of this project. At the kickoff meeting the schedule with the milestones were defined and the first tasks were assigned to the alpha milestone. In frequent meetings the progress of these tasks were tracked and new tasks were created. The work was divided into two to three week iterations with a deliverable version at each end of the iteration.\\
-Constant evolution has been favored over long term planning and this approach has proven itself for this type of work, where unexpected problems are the rule not the exception.
+An agile approach based on RUP has been used as the process model of this project.
+At the kickoff meeting the schedule with the milestones was defined and the first tasks were assigned to the alpha milestone.
+In frequent meetings the progress of these tasks were tracked and new tasks were created.
+The work was divided into two to three week iterations with a deliverable version at the end of each iteration.\\
+Constant evolution has been favored over long term planning and this approach has proven itself for this type of work,
+where unexpected problems are the rule not the exception.
 
-\subsection{Github}\label{github}
-Github was used for planning and tracking of the tasks and milestones. It has a big advantage over other project management tools, as the revision control and the issue tracking is at the same place. Non project members can understand the thoughts behind certain decisions and communicate their ideas directly to team members.\\
+\subsection{GitHub}\label{github}
+GitHub was used for planning and tracking of the tasks and milestones.
+It has a big advantage over other project management tools, as the revision control and the issue tracking is at the same place.
+Non project members can understand the thoughts behind certain decisions and communicate their ideas directly to team members.\\
 An organization named osm2vectortiles was created with the following two repositories:
 
 \begin{itemize}
@@ -22,7 +28,7 @@ Compared to other software projects a much longer elaboration phase has been cho
 
 \begin{figure}[H]
 \centering
-  \includegraphics[scale=0.9]{images/phasen.png}
+  \includegraphics[scale=0.7]{images/phasen.png}
   \caption{Phases during project}
 \end{figure}
 
@@ -86,7 +92,7 @@ In general this project was hazardous, as not a lot of cartographic knowledge wa
 
 \begin{table}[H]
 \centering
-    \begin{tabular}{p{4.5cm} p{5.5cm} p{1.8cm}}
+    \begin{tabular}{p{5.5cm} p{6.5cm} p{1.8cm}}
     \hline
     Risk & Measurement & Probability (1-6)\\
     \hline
@@ -103,11 +109,12 @@ In general this project was hazardous, as not a lot of cartographic knowledge wa
 
 \paragraph{High technical complexity} The project involved a lot of different technologies, as the workflow to produce vector tiles was built up. As a measurement the elaboration phase was used to create a first working prototype, which should prove the implementation concept.
 
-\paragraph{Insufficient tracking of project progress} The project progress was tracked on Github, so the progress was at any time publicly visible. Regular meetings with the advisors helped staying focused on the project goals.
+\paragraph{Insufficient tracking of project progress} The project progress was tracked on Github, so the progress was at any time publicly visible.
+Regular meetings with the advisors helped to stay focused on the project goals.
 
 \paragraph{Infrastructure not sufficient} The rendering process of vector tiles is a very ressource intense task. The school infrastructure was not enough to fulfill the project goals in time. Therefore an alternative platform with more processing power was used to complete the rendering task in time.\\
 
-As this project brought up new challenges every day, not all of the risks could be eliminated during the elaboration phase. Measurements had to be found, when ever new risks appeared.
+As this project brought up new challenges every day, not all of the risks could be eliminated during the elaboration phase. Measurements had to be found, whenever new risks appeared.
 
 %---------------------------------------------------------------
 \newpage
@@ -184,6 +191,7 @@ To have homogeneous software the contributors have settled on common guidelines 
 \subsection{Releases}
 Semantic versioning \cite{pm_7_preston-werner_2015} should be used for releases.
 At the end of each milestone a new release will be created.
+\newpage
 
 \subsection{Git}\label{git}
 \paragraph{Commit Messages}
@@ -199,9 +207,7 @@ To avoid unnecessary merge messages one should always use the
 \texttt{-\/-rebase} parameter.
 
 \subsection{Workflow}\label{git-workflow}
-The Feature Branch Workflow\cite{pm_9_atlassian_git_tutorial_2015} should be used.
-
-Every project member has a local repository with a copy of the remote
+The Feature Branch Workflow\cite{pm_9_atlassian_git_tutorial_2015} should be used. Every project member has a local repository with a copy of the remote
 repository. For each feature ticket in GitHub a separate branch
 will be created. Once a ticket has been completed a pull request will be
 created and needs to be merged into the \texttt{master} branch by an other 

@@ -27,7 +27,7 @@
 %------------------------------------------------
 
 \documentclass[
-	twoside,titlepage,numbers=noenddot,headinclude,%1headlines,
+	titlepage,numbers=noenddot,headinclude,%1headlines,
     footinclude=true,cleardoublepage=empty,
     BCOR=5mm,paper=a4,fontsize=11pt, % Binding correction, paper type and font size
     english, % Languages
@@ -61,7 +61,6 @@
 \include{front_back_matter/abstract}
 \include{front_back_matter/management_summary}
 \include{front_back_matter/acknowledgments}
-\includepdf[pages={1}]{images/project_proposal.pdf}
 
 \pagestyle{scrheadings} % Show chapter titles as headings
 
@@ -92,17 +91,16 @@
 \include{chapters/project_documentation/project_monitoring}\newpage
 
 %------------------------------------------------
-\newpage
-\part{Software Documentation}
-\include{chapters/software_documentation/user_documentation}
-\include{chapters/software_documentation/developer_documentation}
-
-%------------------------------------------------
 %	THESIS CONTENT - APPENDICES
 %------------------------------------------------
+\newpage
 \appendix
 \part{Appendix}
-\include{front_back_matter/meetings}\newpage
+\include{chapters/software_documentation/user_documentation}
+\include{chapters/software_documentation/developer_documentation}
+\includepdf[pages={1}]{images/project_proposal.pdf}
+
+%\include{front_back_matter/meetings}\newpage
 
 %---------------------------------------
 %	POST-CONTENT THESIS PAGES

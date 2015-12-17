@@ -163,8 +163,7 @@ The import workflow is a view under the hood of the different components.
 For generating the vector tiles the tilelive tool \texttt{tl}\cite{5_github_2015} is used which wraps
 around Mapnik. 
 %\marginpar{\nameref{data_style} is a Mapbox Studio source project.}
-The data style defines all feature sets (layers) and is transformed into a Mapnik XML stylesheet by the \\
-\texttt{tilelive-tm2source} provider.
+The data style defines all feature classes (layers) and is transformed into a Mapnik XML stylesheet by the \texttt{tilelive-tm2source} provider.\\
 \texttt{tilelive-bridge} calls Mapnik with the generated stylesheets and hands the generated data over to \texttt{node-mbtiles} which stores the vector tiles in a MBTiles container.
 
 \begin{figure}[H]
@@ -182,12 +181,14 @@ The schema is flat and has no relations. Each table contains information about i
 
 The cornerstone of the entire map is \osm{} data from published snapshots from OSM Planet\cite{5_wiki.openstreetmap.org_2015}.
 %\marginpar{The OSM data is perfect for high zoom levels where detailed coverage of local areas is important.}
-Smaller extracts for single countries and continents are available from Geofabrik\cite{7_download.geofabrik.de_2015}.
-For  single cities or regions the Metro extracts from Mapzen\cite{8_mapzen.com_2015} can be used.
+\begin{itemize}
+\item Smaller extracts for single countries and continents are available from Geofabrik\cite{7_download.geofabrik.de_2015}
+\item For  single cities or regions the Metro extracts from Mapzen\cite{8_mapzen.com_2015} can be used
+\end{itemize}
 \\
 The data is available in the PBF\cite{9_wiki.openstreetmap.org_2015} and OSM XML format \cite{10_wiki.openstreetmap.org_2015}. 
 Data in PBF format is 30\% smaller and 5-6 times faster to read and write than the bzipped OSM XML version.
-\\
+\\\\
 Imposm3 was used to import the OSM data into the PostGIS database.
 Selected tags\cite{11_wiki.openstreetmap.org_2015} and their geometries are defined in an import mapping explicitly.
 Because imposm3 cannot match two types of polygons (e.g. polygon and point) a table was created for each geometry type.
@@ -216,6 +217,7 @@ Because imposm3 cannot match two types of polygons (e.g. polygon and point) a ta
     \end{tabular}
     \caption{Tables from OpenStreetMap planet file}
 \end{table}
+\newpage
 
 \subsection{Custom Curated Labels}
 
@@ -265,7 +267,7 @@ The Natural Earth \cite{16_naturalearthdata.com_2015} data set provides manually
 \\
 The imported Natural Earth data results in more than 100 tables, but only a few
 are relevant for our use case. Country, state borders and large lakes are taken from Natural Earth data for the lower zoom levels.
-
+\\
 The following data sets are used from Natural Earth:
 
 \begin{itemize}
@@ -350,8 +352,7 @@ The landing strips of airports for example might be a linestring or polygon.
 The administrative area on lower zoom levels is entirely from Natural Earth data.
 Only at higher zoom levels where details are more important the OSM borders are rendered.
 
-The Natural Earth data is in different resolutions and for different zoom levels different
-resolutions are used.
+Natural Earth provides data in several generalization levels. The table with highest generalization is used on the lowest zoom levels and on higher zoom levels the less generalized tables.
 
 \begin{figure}[H]
   \centering

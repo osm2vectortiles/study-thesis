@@ -21,15 +21,13 @@ it is important that the import tool is reasonably fast and is able
 to import the OSM planet file in one single day.
 
 \paragraph{Customized Schema}
-Customizing a schema to already split up features into separate tables
-makes querying more performant and easier to do.
+A custom import schema can be used to define the database schema and to map the OSM key/value pairs to a database table.
+The ability to customize the schema
+makes querying simpler and more performant.
 
 \paragraph{Diff Updates}
 It must be possible to apply the Planet diffs \cite{5_wiki.openstreetmap.org_2015}
 to continuously update the database with newer data.
-\\
-If a import is very fast it is also possible to simply reimport the latest
-planet dump.
 
 \paragraph{Existing Data Style Projects}
 In order to get started it is helpful to have a lot of query examples
@@ -136,11 +134,11 @@ Tessera\cite{13_github_2015} is a Node.js\cite{14_foundation_2015} webserver, wh
 
 Load tests were performed to measure server performance with tessera.
 \\
-\textbf{Infrastructure}: AWS EC2 t2.micro instance(1 GB Memory / 1 Core)
+\textbf{Infrastructure}: AWS EC2 t2.micro instance(1 GB Memory / 1 Core)\\
 \textbf{Task}: Zooming in from zoom level 10 to 22 \\
 \textbf{Conditions}: 50 concurrent users \\
 
-A sample result of the load test is shown below.
+The results of the load test is shown below.
 
 \begin{bashcode}
 ---- Global Information --------------------------------------------------------
@@ -163,6 +161,7 @@ A sample result of the load test is shown below.
 \end{bashcode}
 
 With 50 concurrent users tessera was still able to respond to all requests in less than 1200 ms.
+\newpage
 
 \subsection{OpenStreetMap "Standard" Tile Server}\label{osm_standard_tile_server}
 

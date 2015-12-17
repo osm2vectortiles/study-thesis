@@ -4,12 +4,12 @@
 The result of this study thesis are described in Part 1, \hyperref[part1_results]{\emph{section 4.1}}.
 
 \section{Future Development}\label{part2_future_development}
-The first version of our vector tiles have shown, that it is possible to get very close to compatibility with Mapbox Streets in a reasonable amount of time. There are still some quirks, which needs to be ironed out, but we created a good foundation for future development. The two sections below describe small improvements and new features, which will be implemented in our bachelor thesis.
+The first version of the rendered vector tiles has shown, that it is possible to get very close to compatibility with Mapbox Streets in a reasonable amount of time. There are still some quirks, which need to be ironed out, but we created a good foundation for future development. The two sections below describe small improvements and new features, which will be implemented in the bachelor thesis.
 
 \subsection{Small improvements}\label{small_improvements}
  
 \paragraph{Labels}
-The scalerank of the place, marine, state and road labels should be improved. Our current implementation is alright for the moment, but still not equal to Mapbox Street.
+The scalerank of the place, marine, state and road labels should be improved. Th current implementation is good for the moment, but still not equal to Mapbox Streets.
 
 \paragraph{State Labels}
 State labels are used to display states of big countries like USA, Russia or China. More state labels could be added. 
@@ -21,13 +21,13 @@ This layer is using both data sources, because OSM has some issues with marine b
 Using Natural Earth data alone is not suitable, because the data is generalized. Therefore it does not look good on higher zoom levels. For the next release a better data source should be chosen for administrative boundaries.
 
 \paragraph{Country Name Translation Rule}
-Mapbox has defined a fallback rule\cite{22_mapbox.com_2015} for the country names. We struggled implementing it and had to prioritize on other features.
+Mapbox has defined a fallback rule\cite{22_mapbox.com_2015} for the country names. Due to time limits this behavior could not be implemented and should be implemented in a future release.
 
 \paragraph{Special Maki Icons for US Road Labels}
 Mapbox uses different maki icons\cite{101_mapbox.com_2015} for the road labels in the US.  
 
 \paragraph{Possiblity of Mapbox Terrain Visual Style}
-Check if all the data required for a Mapbox style like Mapbox Terrain\cite{102_mapbox.com_2015} is included in our vector tiles
+Check if all the data required for a Mapbox style like Mapbox Terrain\cite{102_mapbox.com_2015} is included in the vector tiles
 
 \paragraph{Exclude Water in Rendering Process}
 
@@ -39,7 +39,7 @@ everything is rendered and the "empty" vector tiles are removed afterwards.
 \subsection{New Features}\label{new_features}
 
 \paragraph{Vector Tiles of Entire World}
-One of the main targets of our bachelor thesis is to render the vector tiles of the entire world. This brings new challenges like scaling our rendering infrastructure. 
+One of the main targets of the bachelor thesis is to render the vector tiles of the entire world. This brings new challenges like scaling the rendering infrastructure. 
 
 \paragraph{Update Vector Tiles}
 A big request of the Swiss OSM community was to provide updated vector tiles based on the diff\cite{5_wiki.openstreetmap.org_2015} files.
