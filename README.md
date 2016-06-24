@@ -1,7 +1,6 @@
-## Study Thesis [![PDF Status](https://www.sharelatex.com/github/repos/osm2vectortiles/osm2vectortiles-thesis/builds/latest/badge.svg)](https://www.sharelatex.com/github/repos/osm2vectortiles/osm2vectortiles-thesis/builds/latest/output.pdf)
+## Study Thesis
 
-This repository contains the study thesis for osm2vectortiles.
-
+This repository contains the study thesis for OSM2VectorTiles. [PDF Build](https://cdn.rawgit.com/osm2vectortiles/study-thesis/master/thesis.pdf)
 
 ### License / Credits
 
