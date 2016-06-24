@@ -1,6 +1,6 @@
 ## Study Thesis
 
-This repository contains the study thesis for OSM2VectorTiles. [PDF Build](https://cdn.rawgit.com/osm2vectortiles/study-thesis/master/thesis.pdf)
+This repository contains the study thesis for OSM2VectorTiles. [PDF Build](https://cdn.rawgit.com/osm2vectortiles/study-thesis/9ef9cf89ff92b0d7f08679727c013076ddea92c8/thesis.pdf)
 
 ### License / Credits
 
